@@ -1,0 +1,3131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiSkripsi — Sistem Manajemen Skripsi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Navy Blue Professional Palette */
+    --navy-900: #0A1628;
+    --navy-800: #0D2040;
+    --navy-700: #112B55;
+    --navy-600: #163970;
+    --navy-500: #1A4785;
+    --navy-400: #2563A8;
+    --navy-300: #3B82C4;
+    --navy-200: #93C5E8;
+    --navy-100: #DBEAFE;
+    --navy-50:  #EFF6FF;
+
+    --bg: #F0F4F8;
+    --surface: #FFFFFF;
+    --surface2: #F7FAFC;
+    --surface3: #EDF2F7;
+    --border: #E2E8F0;
+    --border2: #CBD5E1;
+    --text: #0F172A;
+    --text2: #475569;
+    --text3: #94A3B8;
+
+    --accent: var(--navy-600);
+    --accent-hover: var(--navy-700);
+    --accent-light: #EFF6FF;
+    --accent-mid: var(--navy-300);
+
+    --success: #0F766E;
+    --success-light: #F0FDFA;
+    --success-border: #99F6E4;
+
+    --danger: #DC2626;
+    --danger-light: #FEF2F2;
+    --danger-border: #FECACA;
+
+    --warning: #D97706;
+    --warning-light: #FFFBEB;
+    --warning-border: #FDE68A;
+
+    --info: #0369A1;
+    --info-light: #F0F9FF;
+    --info-border: #BAE6FD;
+
+    --gold: #B45309;
+    --gold-light: #FFFBEB;
+
+    --radius: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(15,23,42,0.06);
+    --shadow-lg: 0 8px 24px rgba(15,23,42,0.10), 0 2px 6px rgba(15,23,42,0.06);
+    --shadow-navy: 0 4px 16px rgba(22,57,112,0.18);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+  /* ─── FIREBASE SETUP ─── */
+  #firebase-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 50%, var(--navy-500) 100%); padding: 2rem;
+    position: relative; overflow: hidden;
+  }
+  #firebase-screen::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 70% 20%, rgba(59,130,196,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(26,71,133,0.2) 0%, transparent 50%);
+  }
+  .firebase-card {
+    background: rgba(255,255,255,0.97); border: 1px solid rgba(255,255,255,0.3); border-radius: var(--radius-xl);
+    padding: 2.5rem; max-width: 480px; width: 100%; box-shadow: var(--shadow-lg); position: relative; z-index: 1;
+  }
+  .firebase-card h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; font-weight: 400; color: var(--navy-700); margin-bottom: .25rem; }
+  .firebase-card .subtitle { color: var(--text2); font-size: .875rem; margin-bottom: 1.75rem; }
+  .firebase-card label { display: block; font-size: .72rem; font-weight: 600; color: var(--text2); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .4rem; margin-top: 1rem; }
+  .firebase-card input { width: 100%; padding: .65rem .9rem; border: 1.5px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: .875rem; background: var(--surface); color: var(--text); outline: none; transition: border-color .2s, box-shadow .2s; }
+  .firebase-card input:focus { border-color: var(--navy-400); box-shadow: 0 0 0 3px rgba(22,57,112,0.1); }
+  .btn-primary { background: var(--navy-700); color: #fff; border: none; padding: .75rem 1.25rem; border-radius: var(--radius); font-family: inherit; font-size: .875rem; font-weight: 600; cursor: pointer; width: 100%; margin-top: 1.5rem; transition: background .2s, box-shadow .2s; letter-spacing: .01em; }
+  .btn-primary:hover { background: var(--navy-800); box-shadow: var(--shadow-navy); }
+  .divider { text-align: center; color: var(--text3); font-size: .8rem; margin: 1.25rem 0; position: relative; }
+  .divider::before, .divider::after { content:''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--border); }
+  .divider::before { left: 0; } .divider::after { right: 0; }
+  .btn-outline { background: transparent; color: var(--text2); border: 1.5px solid var(--border2); padding: .65rem 1.25rem; border-radius: var(--radius); font-family: inherit; font-size: .875rem; cursor: pointer; width: 100%; transition: all .2s; font-weight: 500; }
+  .btn-outline:hover { background: var(--navy-50); border-color: var(--navy-300); color: var(--navy-700); }
+  .firebase-tip { background: var(--navy-50); border: 1px solid var(--navy-100); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.25rem; font-size: .8rem; color: var(--navy-700); line-height: 1.6; }
+  .firebase-tip ol { margin-left: 1.1rem; margin-top: .4rem; }
+  #fb-status { font-size: .8rem; color: var(--navy-700); text-align: center; margin-top: .75rem; min-height: 1.2em; }
+
+  /* ─── LOGIN ─── */
+  #login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 50%, var(--navy-500) 100%); padding: 2rem;
+    position: relative; overflow: hidden;
+  }
+  #login-screen::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 70% 20%, rgba(59,130,196,0.12) 0%, transparent 55%),
+                radial-gradient(ellipse at 15% 85%, rgba(10,22,40,0.3) 0%, transparent 50%);
+  }
+  .login-card {
+    background: rgba(255,255,255,0.97); border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-xl);
+    padding: 2.75rem 2.5rem; max-width: 400px; width: 100%; box-shadow: var(--shadow-lg); position: relative; z-index: 1;
+  }
+  .login-logo { display: flex; align-items: center; gap: .875rem; margin-bottom: 2rem; }
+  .login-logo .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--navy-700), var(--navy-400)); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(22,57,112,0.3); }
+  .login-logo .logo-icon svg { stroke: #fff; }
+  .login-logo h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; font-weight: 400; color: var(--navy-800); }
+  .login-logo span { font-size: .72rem; color: var(--text3); display: block; margin-top: 2px; letter-spacing: .02em; }
+  .login-card label { display: block; font-size: .72rem; font-weight: 600; color: var(--text2); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .45rem; margin-top: 1.1rem; }
+  .login-card input { width: 100%; padding: .7rem .9rem; border: 1.5px solid var(--border); border-radius: var(--radius); font-family: inherit; font-size: .875rem; background: var(--surface2); color: var(--text); outline: none; transition: border-color .2s, box-shadow .2s, background .2s; }
+  .login-card input:focus { border-color: var(--navy-400); box-shadow: 0 0 0 3px rgba(22,57,112,0.1); background: var(--surface); }
+  #login-err { color: var(--danger); font-size: .8rem; margin-top: .6rem; min-height: 1.2em; }
+
+  /* ─── MAIN APP ─── */
+  #app { display: none; min-height: 100vh; }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 252px; position: fixed; left: 0; top: 0; bottom: 0;
+    background: var(--navy-800);
+    display: flex; flex-direction: column; overflow: hidden; z-index: 10;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  }
+  .sidebar-header { 
+    padding: 1.5rem 1.25rem 1.25rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    background: var(--navy-900);
+  }
+  .sidebar-logo { display: flex; align-items: center; gap: .75rem; }
+  .sidebar-logo .logo-icon { 
+    width: 36px; height: 36px; 
+    background: linear-gradient(135deg, var(--navy-400), var(--navy-300));
+    border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(37,99,168,0.35);
+  }
+  .sidebar-logo h2 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; font-weight: 400; color: #fff; }
+  .sidebar-logo span { font-size: .68rem; color: rgba(255,255,255,0.4); display: block; line-height: 1; margin-top: 2px; letter-spacing: .02em; }
+  .sidebar-user { 
+    padding: 1rem 1.25rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    background: rgba(0,0,0,0.15);
+  }
+  .user-chip { display: flex; align-items: center; gap: .75rem; }
+  .user-avatar { 
+    width: 36px; height: 36px; border-radius: 10px; 
+    background: linear-gradient(135deg, var(--navy-400), var(--navy-300));
+    color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .78rem; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .user-name { font-weight: 600; font-size: .82rem; color: rgba(255,255,255,0.9); line-height: 1.25; }
+  .user-role { font-size: .7rem; color: rgba(255,255,255,0.4); margin-top: 1px; }
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: .875rem 0; }
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+  .nav-section { 
+    padding: .75rem 1.25rem .3rem; font-size: .63rem; font-weight: 700; 
+    letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,0.3);
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: .7rem; padding: .55rem 1.25rem;
+    color: rgba(255,255,255,0.55); font-size: .825rem; cursor: pointer; transition: all .15s;
+    border-left: 3px solid transparent; font-weight: 500; margin: 1px 0;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+  .nav-item.active { 
+    background: rgba(59,130,196,0.18); color: #fff; 
+    border-left-color: var(--navy-300); font-weight: 600;
+  }
+  .nav-item .icon { width: 16px; height: 16px; flex-shrink: 0; opacity: .7; }
+  .nav-item.active .icon { opacity: 1; }
+  .sidebar-footer { 
+    padding: .875rem 1.25rem; 
+    border-top: 1px solid rgba(255,255,255,0.07);
+    background: rgba(0,0,0,0.1);
+  }
+  .btn-logout { 
+    width: 100%; padding: .55rem; background: transparent; 
+    border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius); 
+    font-family: inherit; font-size: .8rem; color: rgba(255,255,255,0.5); 
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .5rem; transition: all .15s; 
+  }
+  .btn-logout:hover { background: rgba(220,38,38,0.15); color: #FCA5A5; border-color: rgba(220,38,38,0.3); }
+
+  /* Main content */
+  .main { margin-left: 252px; padding: 2rem 2.25rem; min-height: 100vh; }
+  
+  /* Page sections */
+  .page { display: none; }
+  .page.active { display: block; }
+  
+  /* Page header */
+  .page-header { margin-bottom: 1.75rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 1.75rem; font-weight: 400; color: var(--navy-800); letter-spacing: -.01em; }
+  .page-header p { color: var(--text2); font-size: .875rem; margin-top: .35rem; }
+  
+  /* Cards */
+  .card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); 
+    padding: 1.375rem 1.625rem; box-shadow: var(--shadow);
+  }
+  .card-title { 
+    font-weight: 700; font-size: .875rem; color: var(--text); margin-bottom: 1.125rem; 
+    display: flex; align-items: center; justify-content: space-between;
+    letter-spacing: -.01em;
+  }
+  
+  /* Stats grid */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.625rem; }
+  .stat-card { 
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); 
+    padding: 1.375rem 1.5rem; box-shadow: var(--shadow); 
+    position: relative; overflow: hidden; transition: box-shadow .2s, transform .2s;
+  }
+  .stat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .stat-card::before { 
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--navy-600), var(--navy-300));
+  }
+  .stat-card.green::before { background: linear-gradient(90deg, var(--success), #34D399); }
+  .stat-card.amber::before { background: linear-gradient(90deg, var(--warning), #FCD34D); }
+  .stat-card.blue::before { background: linear-gradient(90deg, var(--info), var(--navy-300)); }
+  .stat-label { font-size: .7rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text3); margin-bottom: .5rem; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 2.25rem; font-weight: 400; color: var(--navy-800); line-height: 1; }
+  .stat-desc { font-size: .75rem; color: var(--text3); margin-top: .4rem; }
+  .stat-card.green .stat-value { color: var(--success); }
+  .stat-card.amber .stat-value { color: var(--warning); }
+  .stat-card.blue .stat-value { color: var(--info); }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.125rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.125rem; }
+
+  /* Buttons */
+  .btn { padding: .55rem 1.1rem; border-radius: var(--radius); font-family: inherit; font-size: .82rem; font-weight: 600; cursor: pointer; border: none; transition: all .18s; display: inline-flex; align-items: center; gap: .4rem; letter-spacing: .01em; }
+  .btn-sm { padding: .35rem .8rem; font-size: .78rem; }
+  .btn-green { background: var(--navy-700); color: #fff; box-shadow: 0 1px 3px rgba(22,57,112,0.2); }
+  .btn-green:hover { background: var(--navy-800); box-shadow: var(--shadow-navy); transform: translateY(-1px); }
+  .btn-red { background: var(--danger); color: #fff; }
+  .btn-red:hover { background: #B91C1C; box-shadow: 0 4px 12px rgba(220,38,38,0.25); }
+  .btn-amber { background: var(--warning); color: #fff; }
+  .btn-amber:hover { background: #B45309; }
+  .btn-ghost { background: transparent; color: var(--text2); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface3); border-color: var(--border2); color: var(--text); }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; padding: .22rem .65rem; border-radius: 99px; font-size: .7rem; font-weight: 600; letter-spacing: .02em; }
+  .badge-green { background: var(--success-light); color: var(--success); border: 1px solid var(--success-border); }
+  .badge-amber { background: var(--warning-light); color: var(--warning); border: 1px solid var(--warning-border); }
+  .badge-red { background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger-border); }
+  .badge-blue { background: var(--navy-50); color: var(--navy-600); border: 1px solid var(--navy-100); }
+  .badge-gray { background: var(--surface3); color: var(--text2); border: 1px solid var(--border); }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+  thead th { 
+    text-align: left; padding: .75rem 1rem; 
+    background: var(--navy-50); color: var(--navy-700); 
+    font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    border-bottom: 2px solid var(--navy-100);
+  }
+  thead th:first-child { border-radius: var(--radius) 0 0 0; }
+  thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: .8rem 1rem; color: var(--text); vertical-align: middle; }
+  tbody tr:hover { background: var(--navy-50); }
+
+  /* Forms */
+  .form-group { margin-bottom: 1.1rem; }
+  .form-label { display: block; font-size: .72rem; font-weight: 600; color: var(--text2); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .45rem; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: .7rem .9rem; border: 1.5px solid var(--border); border-radius: var(--radius);
+    font-family: inherit; font-size: .875rem; background: var(--surface2); color: var(--text); outline: none; transition: border-color .2s, box-shadow .2s, background .2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { 
+    border-color: var(--navy-400); box-shadow: 0 0 0 3px rgba(22,57,112,0.1); background: var(--surface);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(10,22,40,.55); z-index: 100;
+    display: flex; align-items: center; justify-content: center; padding: 1rem;
+    backdrop-filter: blur(4px);
+  }
+  .modal {
+    background: var(--surface); border-radius: var(--radius-xl); padding: 2rem;
+    max-width: 540px; width: 100%; box-shadow: 0 20px 60px rgba(10,22,40,0.25); 
+    max-height: 90vh; overflow-y: auto;
+    border: 1px solid var(--border);
+  }
+  .modal h2 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; font-weight: 400; margin-bottom: 1.375rem; color: var(--navy-800); }
+  .modal-actions { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.625rem; }
+
+  /* Timeline / logbook */
+  .timeline { position: relative; padding-left: 1.5rem; }
+  .timeline::before { content:''; position: absolute; left: .35rem; top: .5rem; bottom: .5rem; width: 2px; background: linear-gradient(to bottom, var(--navy-300), var(--border)); }
+  .tl-item { position: relative; margin-bottom: 1.375rem; }
+  .tl-dot { position: absolute; left: -1.2rem; top: .4rem; width: 10px; height: 10px; border-radius: 50%; background: var(--navy-500); border: 2px solid var(--bg); box-shadow: 0 0 0 2px var(--navy-200); }
+  .tl-date { font-size: .7rem; color: var(--text3); font-weight: 600; margin-bottom: .3rem; letter-spacing: .03em; }
+  .tl-content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .875rem 1rem; font-size: .83rem; box-shadow: var(--shadow-sm); }
+  .tl-content strong { display: block; font-weight: 600; margin-bottom: .2rem; color: var(--navy-800); }
+  .tl-content p { color: var(--text2); line-height: 1.55; }
+  .tl-status { display: inline-flex; margin-top: .4rem; }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 3.5rem 1rem; color: var(--text3); }
+  .empty-state .icon { font-size: 2.75rem; margin-bottom: .875rem; }
+  .empty-state p { font-size: .875rem; }
+
+  /* Progress bar */
+  .progress-bar { height: 6px; background: var(--surface3); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--navy-600), var(--navy-300)); border-radius: 99px; transition: width .5s cubic-bezier(.4,0,.2,1); }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; }
+  .tab { padding: .7rem 1.1rem; font-size: .83rem; font-weight: 600; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
+  .tab.active { color: var(--navy-700); border-bottom-color: var(--navy-600); }
+  .tab:hover { color: var(--text); }
+
+  /* Info box */
+  .info-box { padding: .825rem 1rem; border-radius: var(--radius); font-size: .82rem; line-height: 1.55; margin-bottom: 1rem; }
+  .info-box.green { background: var(--success-light); color: var(--success); border: 1px solid var(--success-border); }
+  .info-box.amber { background: var(--warning-light); color: var(--warning); border: 1px solid var(--warning-border); }
+  .info-box.red { background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger-border); }
+  .info-box.blue { background: var(--navy-50); color: var(--navy-700); border: 1px solid var(--navy-100); }
+
+
+  /* ─── PRINT / KARTU BIMBINGAN ─── */
+  @media print {
+    body > *:not(#print-area) { display: none !important; }
+    #print-area { display: block !important; position: static !important; margin: 0; padding: 0; background: #fff; }
+    .no-print { display: none !important; }
+    .kartu-bimbingan { max-width: 100% !important; padding: 1.5cm 2cm !important; }
+    .kartu-table { page-break-inside: auto; }
+    .kartu-table tr { page-break-inside: avoid; page-break-after: auto; }
+    .kartu-ttd { page-break-inside: avoid; }
+  }
+  #print-area { display: none; }
+  .kartu-bimbingan {
+    font-family: 'Inter', sans-serif;
+    max-width: 800px; margin: 0 auto; padding: 2rem;
+    background: #fff; color: #000;
+  }
+  .kartu-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 1rem; margin-bottom: 1.25rem; }
+  .kartu-header .kampus-name { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .kartu-header .prodi-name { font-size: .9rem; font-weight: 600; }
+  .kartu-header .doc-title { font-size: 1.25rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin-top: .75rem; }
+  .kartu-identitas { display: grid; grid-template-columns: 140px 1fr; gap: .3rem .75rem; font-size: .85rem; margin-bottom: 1.25rem; border: 1px solid #999; padding: .875rem 1rem; border-radius: 4px; }
+  .kartu-identitas .lbl { font-weight: 600; color: #333; }
+  .kartu-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-bottom: 1.5rem; }
+  .kartu-table th { background: #f0f0f0; border: 1px solid #999; padding: .5rem .6rem; text-align: center; font-weight: 700; }
+  .kartu-table td { border: 1px solid #999; padding: .5rem .6rem; vertical-align: top; }
+  .kartu-table td:first-child { text-align: center; width: 36px; }
+  .kartu-ttd { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem; }
+  .kartu-ttd-box { text-align: center; }
+  .kartu-ttd-box .ttd-label { font-size: .8rem; font-weight: 600; margin-bottom: 3.5rem; }
+  .kartu-ttd-box .ttd-name { border-top: 1px solid #000; padding-top: .35rem; font-size: .82rem; font-weight: 700; }
+  .kartu-ttd-box .ttd-nip { font-size: .75rem; color: #555; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+  /* Divider */
+  hr { border: none; border-top: 1px solid var(--border); margin: 1.375rem 0; }
+
+  /* Action bar */
+  .action-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.375rem; gap: 1rem; flex-wrap: wrap; }
+  .search-input { 
+    padding: .6rem .95rem; border: 1.5px solid var(--border); border-radius: var(--radius); 
+    font-family: inherit; font-size: .83rem; background: var(--surface); color: var(--text); 
+    outline: none; width: 240px; transition: border-color .2s, box-shadow .2s; 
+  }
+  .search-input:focus { border-color: var(--navy-400); box-shadow: 0 0 0 3px rgba(22,57,112,0.1); }
+
+  .back-btn { background: transparent; border: none; color: var(--text2); font-size: .83rem; cursor: pointer; display: flex; align-items: center; gap: .4rem; font-family: inherit; font-weight: 600; margin-bottom: 1rem; padding: 0; transition: color .15s; }
+  .back-btn:hover { color: var(--navy-600); }
+
+  /* Step indicator */
+  .steps { display: flex; align-items: center; gap: .5rem; margin-bottom: 1.75rem; }
+  .step { display: flex; align-items: center; gap: .5rem; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; }
+  .step-num.done { background: var(--navy-600); color: #fff; }
+  .step-num.active { background: var(--navy-50); color: var(--navy-700); border: 2px solid var(--navy-500); }
+  .step-num.pending { background: var(--surface3); color: var(--text3); }
+  .step-label { font-size: .78rem; font-weight: 600; color: var(--text2); }
+  .step-line { flex: 1; height: 2px; background: var(--border); min-width: 20px; }
+  .step-line.done { background: var(--navy-400); }
+
+  /* Notice badge */
+  .notif-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; display: inline-block; margin-left: auto; }
+
+  /* File item */
+  .file-item { display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: .5rem; background: var(--surface); transition: border-color .15s, box-shadow .15s; }
+  .file-item:hover { border-color: var(--navy-200); box-shadow: var(--shadow-sm); }
+  .file-icon { width: 34px; height: 34px; border-radius: 8px; background: var(--navy-50); color: var(--navy-600); display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; flex-shrink: 0; border: 1px solid var(--navy-100); }
+  .file-name { font-weight: 600; font-size: .83rem; }
+  .file-meta { font-size: .72rem; color: var(--text3); }
+
+  /* Rating */
+  .rating-row { display: flex; align-items: center; justify-content: space-between; padding: .55rem 0; border-bottom: 1px solid var(--border); }
+  .rating-row:last-child { border-bottom: none; }
+  .rating-label { font-size: .83rem; color: var(--text2); }
+  .rating-score { font-weight: 700; font-size: 1.1rem; color: var(--navy-600); }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     FIREBASE SETUP SCREEN
+══════════════════════════════════ -->
+<div id="firebase-screen">
+  <div class="firebase-card">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;">
+      <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--navy-700),var(--navy-400));border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(22,57,112,0.3);">
+        <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 19h20L12 2z"/><path d="M12 9v5M12 16h.01"/></svg>
+      </div>
+      <div>
+        <h1 style="font-size:1.3rem;margin-bottom:0;">SiSkripsi</h1>
+        <div style="font-size:.75rem;color:var(--text2);">Sistem Manajemen Skripsi</div>
+      </div>
+    </div>
+    <div class="firebase-tip">
+      <strong>🔥 Panduan menghubungkan Firebase:</strong>
+      <ol>
+        <li>Buka <a href="https://console.firebase.google.com" target="_blank" style="color:var(--navy-600);font-weight:600;">console.firebase.google.com</a></li>
+        <li>Buat project baru → aktifkan <strong>Realtime Database</strong></li>
+        <li>Di Rules, set: <code style="background:rgba(0,0,0,.07);padding:.1rem .3rem;border-radius:4px;">".read":true,".write":true</code></li>
+        <li>Salin konfigurasi dari <strong>Project Settings → SDK</strong></li>
+      </ol>
+    </div>
+    <label>API Key</label>
+    <input id="fb-apikey" type="text" placeholder="AIzaSy...">
+    <label>Database URL <span style="color:var(--danger);">*wajib</span></label>
+    <input id="fb-dburl" type="text" placeholder="https://project-id-default-rtdb.firebaseio.com">
+    <label>Project ID</label>
+    <input id="fb-projectid" type="text" placeholder="my-project-id">
+    <label>Auth Domain</label>
+    <input id="fb-authdomain" type="text" placeholder="my-project.firebaseapp.com">
+    <button class="btn-primary" onclick="connectFirebase()">🔥 Hubungkan & Mulai</button>
+    <div id="fb-status"></div>
+    <div class="divider">atau gunakan mode offline</div>
+    <button class="btn-outline" onclick="useOffline()">💾 Lanjutkan tanpa Firebase (Offline)</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════ -->
+<div id="login-screen" style="display:none;">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2L2 19h20L12 2z"/><path d="M12 9v5M12 16h.01"/></svg>
+      </div>
+      <div>
+        <h1>SiSkripsi</h1>
+        <span>Sistem Manajemen Skripsi</span>
+      </div>
+    </div>
+    <p style="font-size:.875rem;color:var(--text2);margin-bottom:1.5rem;">Masuk dengan akun yang diberikan administrator</p>
+    <label>Username</label>
+    <input id="login-user" class="form-input" type="text" placeholder="username">
+    <label style="margin-top:.85rem;display:block;font-size:.75rem;font-weight:600;color:var(--text2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:.4rem;">Password</label>
+    <div style="position:relative;">
+      <input id="login-pass" class="form-input" type="password" placeholder="••••••••" style="padding-right:2.5rem;">
+      <button onclick="togglePwd('login-pass',this)" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:.8rem;">👁</button>
+    </div>
+    <div id="login-err"></div>
+    <button class="btn-primary" onclick="doLogin()" style="margin-top:1.375rem;">Masuk →</button>
+    <div id="login-reset-wrap" style="display:none;"><!-- Reset login dinonaktifkan --></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MAIN APP
+══════════════════════════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2L2 19h20L12 2z"/><path d="M12 9v5M12 16h.01"/></svg>
+        </div>
+        <div>
+          <h2>SiSkripsi</h2>
+          <span>Manajemen Skripsi</span>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-chip">
+        <div class="user-avatar" id="sidebar-avatar">MH</div>
+        <div>
+          <div class="user-name" id="sidebar-name">—</div>
+          <div class="user-role" id="sidebar-role">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-nav" id="sidebar-nav"></div>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Keluar
+      </button>
+      <button id="btn-reset-data" class="btn-logout" onclick="showResetConfirm()" style="margin-top:.4rem;font-size:.72rem;opacity:.6;display:none;color:var(--danger);">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+        Reset Data
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main-content"></main>
+</div>
+
+<!-- PRINT AREA -->
+<div id="print-area"></div>
+
+<!-- MODAL CONTAINER -->
+<div id="modal-container"></div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA STORE
+// ═══════════════════════════════════════
+let DB = null;
+let firebaseRef = null;
+let currentUser = null;
+let appData = {
+  users: {},
+  mahasiswa: {},
+  dosen: {},
+  skripsi: {},
+  bimbingan: {},
+  dokumen: {},
+  sidang: {},
+  nilai: {}
+};
+
+function initDefaultData() {
+  // Default users
+  appData.users = {
+    'admin': { password:'admin123', role:'admin', name:'Administrator', id:'admin' },
+    'mhs001': { password:'pass123', role:'mahasiswa', name:'Siti Rahayu', id:'mhs001', nim:'220201001', dosbingId:'dsn001' },
+    'mhs002': { password:'pass123', role:'mahasiswa', name:'Budi Santoso', id:'mhs002', nim:'220201002', dosbingId:'dsn001' },
+    'mhs003': { password:'pass123', role:'mahasiswa', name:'Nur Aisyah', id:'mhs003', nim:'220201003', dosbingId:'dsn002' },
+    'dsn001': { password:'pass123', role:'dosen', name:'Dr. Ahmad Fauzi, M.Kom', id:'dsn001', nip:'198001012010011001' },
+    'dsn002': { password:'pass123', role:'dosen', name:'Prof. Sari Dewi, Ph.D', id:'dsn002', nip:'197505152005012001' },
+  };
+  appData.skripsi = {
+    's001': {
+      id:'s001', mahasiswaId:'mhs001', judul:'Sistem Deteksi Penyakit Tanaman Menggunakan CNN',
+      status:'perbaikan_proposal', tglPengajuan:'2024-02-10', dosbingId:'dsn001', dosbingId2:'dsn002', catatan:'Seminar proposal selesai, lanjut perbaikan',
+      riwayatProgres: [
+        { status:'pengajuan',       tanggal:'2024-02-10', catatan:'Judul diajukan', oleh:'Siti Rahayu' },
+        { status:'acc_judul',       tanggal:'2024-02-15', catatan:'Disetujui dengan revisi minor', oleh:'Dr. Ahmad Fauzi, M.Kom' },
+        { status:'bimbingan_proposal', tanggal:'2024-02-20', catatan:'Mulai bimbingan proposal', oleh:'Dr. Ahmad Fauzi, M.Kom' },
+        { status:'acc_sempro',      tanggal:'2024-03-25', catatan:'Proposal disetujui untuk seminar', oleh:'Dr. Ahmad Fauzi, M.Kom' },
+        { status:'sempro',          tanggal:'2024-04-01', catatan:'Seminar proposal selesai', oleh:'Dr. Ahmad Fauzi, M.Kom' },
+        { status:'perbaikan_proposal', tanggal:'2024-04-05', catatan:'Perbaikan sesuai masukan seminar proposal', oleh:'Dr. Ahmad Fauzi, M.Kom' },
+      ]
+    },
+    's002': {
+      id:'s002', mahasiswaId:'mhs002', judul:'Analisis Sentimen Media Sosial dengan BERT',
+      status:'pengajuan', tglPengajuan:'2024-03-05', dosbingId:'dsn001', dosbingId2:'dsn002', catatan:'',
+      riwayatProgres: [
+        { status:'pengajuan', tanggal:'2024-03-05', catatan:'Judul diajukan', oleh:'Budi Santoso' },
+      ]
+    },
+    's003': {
+      id:'s003', mahasiswaId:'mhs003', judul:'Aplikasi Augmented Reality untuk Pembelajaran',
+      status:'acc_ujian', tglPengajuan:'2024-01-15', dosbingId:'dsn002', dosbingId2:'dsn001', catatan:'Siap ujian skripsi',
+      riwayatProgres: [
+        { status:'pengajuan',            tanggal:'2024-01-15', catatan:'Judul diajukan', oleh:'Nur Aisyah' },
+        { status:'acc_judul',            tanggal:'2024-01-20', catatan:'Disetujui', oleh:'Prof. Sari Dewi, Ph.D' },
+        { status:'bimbingan_aktif',      tanggal:'2024-01-25', catatan:'Mulai bimbingan', oleh:'Prof. Sari Dewi, Ph.D' },
+        { status:'acc_sempro',           tanggal:'2024-02-10', catatan:'Proposal disetujui', oleh:'Prof. Sari Dewi, Ph.D' },
+        { status:'sempro',               tanggal:'2024-02-15', catatan:'Seminar proposal selesai', oleh:'Prof. Sari Dewi, Ph.D' },
+        { status:'perbaikan_proposal', tanggal:'2024-02-20', catatan:'Perbaikan bab 1-3', oleh:'Prof. Sari Dewi, Ph.D' },
+        { status:'acc_semhas',           tanggal:'2024-03-10', catatan:'Siap seminar hasil', oleh:'Prof. Sari Dewi, Ph.D' },
+        { status:'semhas',               tanggal:'2024-03-20', catatan:'Seminar hasil selesai', oleh:'Prof. Sari Dewi, Ph.D' },
+        { status:'perbaikan_hasil', tanggal:'2024-03-25', catatan:'Perbaikan akhir', oleh:'Prof. Sari Dewi, Ph.D' },
+        { status:'acc_ujian',            tanggal:'2024-04-10', catatan:'Siap ujian skripsi', oleh:'Prof. Sari Dewi, Ph.D' },
+      ]
+    },
+  };
+  appData.bimbingan = {
+    'b001': { id:'b001', skripsiId:'s001', tanggal:'2024-02-20', topik:'Penentuan dataset dan metodologi', catatan:'Mahasiswa diminta mengumpulkan minimal 500 sampel gambar per kelas', status:'selesai', dosbingId:'dsn001', mahasiswaId:'mhs001' },
+    'b002': { id:'b002', skripsiId:'s001', tanggal:'2024-03-05', topik:'Review bab 1 dan 2', catatan:'Latar belakang perlu diperkuat dengan referensi terbaru (2020-2024)', status:'selesai', dosbingId:'dsn001', mahasiswaId:'mhs001' },
+    'b003': { id:'b003', skripsiId:'s001', tanggal:'2024-03-20', topik:'Pembahasan arsitektur model', catatan:'Gunakan ResNet50 sebagai baseline, bandingkan dengan MobileNetV2', status:'revisi', dosbingId:'dsn001', mahasiswaId:'mhs001' },
+    'b004': { id:'b004', skripsiId:'s003', tanggal:'2024-03-01', topik:'Review prototype AR', catatan:'Prototype sudah bagus, perlu pengujian usability', status:'selesai', dosbingId:'dsn002', mahasiswaId:'mhs003' },
+  };
+  appData.dokumen = {
+    'd001': { id:'d001', skripsiId:'s001', mahasiswaId:'mhs001', nama:'Proposal Skripsi v1.pdf', tipe:'proposal', tglUpload:'2024-02-12', url:'#', status:'disetujui' },
+    'd002': { id:'d002', skripsiId:'s001', mahasiswaId:'mhs001', nama:'Bab 1-2 Draft.pdf', tipe:'bab', tglUpload:'2024-03-10', url:'#', status:'review' },
+    'd003': { id:'d003', skripsiId:'s003', mahasiswaId:'mhs003', nama:'Draft Skripsi Final.pdf', tipe:'final', tglUpload:'2024-03-28', url:'#', status:'disetujui' },
+  };
+  appData.sidang = {
+    'sd001': { id:'sd001', skripsiId:'s003', mahasiswaId:'mhs003', tanggal:'2024-04-15', jam:'09:00', ruang:'Ruang Sidang A', dosPenguji1:'dsn001', dosPenguji2:'dsn002', dosPenguji3:'dsn002', status:'terjadwal' },
+  };
+  appData.nilai = {
+    'n001': { id:'n001', skripsiId:'s003', mahasiswaId:'mhs003', penguji1:{ pembimbing:85, presentasi:80, penguasaan:78 }, penguji2:{ pembimbing:88, presentasi:82, penguasaan:80 }, penguji3:{ pembimbing:87, presentasi:81, penguasaan:79 }, totalNilai:null, grade:null, catatan:'' },
+  };
+  appData._version = DATA_VERSION;
+  saveLocal();
+}
+
+// ═══════════════════════════════════════
+// STORAGE + MIGRASI
+// ═══════════════════════════════════════
+const DATA_VERSION = 3;
+
+function saveLocal() {
+  // Tidak simpan ke localStorage agar tidak menimpa data Firebase
+  // appData._version = DATA_VERSION;
+  // localStorage.setItem('siSkripsi_data', JSON.stringify(appData));
+}
+let _savePending = false;
+let _suppressRerender = false;
+function saveData() {
+  appData._version = DATA_VERSION;
+  if (firebaseRef) {
+    if (_savePending) return;
+    _savePending = true;
+    _suppressRerender = true;
+    setTimeout(() => {
+      firebaseRef.set(JSON.parse(JSON.stringify(appData)));
+      _savePending = false;
+      setTimeout(() => { _suppressRerender = false; }, 500);
+    }, 100);
+  } else {
+    // Fallback offline
+    localStorage.setItem('siSkripsi_data', JSON.stringify(appData));
+  }
+}
+function loadLocal() {
+  const d = localStorage.getItem('siSkripsi_data');
+  if (d) { appData = migrasiData(JSON.parse(d)); return true; }
+  return false;
+}
+function genId(prefix) {
+  return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+}
+
+// Migrasi otomatis data lama ke format tahapan baru
+function migrasiData(data) {
+  if (!data) return data;
+  if (!data.users)     data.users     = {};
+  if (!data.skripsi)   data.skripsi   = {};
+  if (!data.bimbingan) data.bimbingan = {};
+  if (!data.dokumen)   data.dokumen   = {};
+  if (!data.sidang)    data.sidang    = {};
+  if (!data.nilai)     data.nilai     = {};
+  // Jika versi sudah cocok atau data tidak punya skripsi, kembalikan apa adanya
+  if ((data._version || 0) >= DATA_VERSION) return data;
+  const statusMap = {
+    'disetujui': 'acc_judul',
+    'bimbingan': 'bimbingan_aktif',
+    'sidang':    'ujian_skripsi',
+    'selesai':   'wisuda',
+  };
+  Object.values(data.skripsi).forEach(sk => {
+    if (statusMap[sk.status]) sk.status = statusMap[sk.status];
+    if (!sk.riwayatProgres || sk.riwayatProgres.length === 0) {
+      sk.riwayatProgres = [{
+        status: sk.status,
+        tanggal: sk.tglPengajuan || new Date().toISOString().slice(0,10),
+        catatan: 'Migrasi otomatis',
+        oleh: 'Sistem'
+      }];
+    }
+  });
+  data._version = DATA_VERSION;
+  return data;
+}
+
+function showResetConfirm() {
+  if (!currentUser || currentUser.role !== 'admin') return;
+  const jmlMhs = Object.values(appData.users).filter(u => u.role === 'mahasiswa').length;
+  const jmlDosen = Object.values(appData.users).filter(u => u.role === 'dosen').length;
+  const jmlSkripsi = Object.values(appData.skripsi).length;
+  const jmlLog = Object.values(appData.bimbingan).length;
+  openModal(`
+    <div style="text-align:center;margin-bottom:1.25rem;">
+      <div style="width:56px;height:56px;background:var(--danger-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;font-size:1.6rem;">⚠️</div>
+      <h2 style="color:var(--danger);margin:0 0 .35rem;">Reset Semua Data?</h2>
+      <p style="font-size:.85rem;color:var(--text2);">Tindakan ini <strong>tidak dapat dibatalkan</strong>.</p>
+    </div>
+    <div style="background:var(--danger-light);border:1px solid var(--danger);border-radius:var(--radius);padding:.875rem 1rem;margin-bottom:1.25rem;font-size:.83rem;line-height:1.7;">
+      Data yang akan <strong style="color:var(--danger);">dihapus permanen</strong>:<br>
+      🧑‍🎓 <strong>${jmlMhs} mahasiswa</strong> &nbsp;·&nbsp; 👨‍🏫 <strong>${jmlDosen} dosen</strong><br>
+      📄 <strong>${jmlSkripsi} skripsi</strong> &nbsp;·&nbsp; 📝 <strong>${jmlLog} entri logbook</strong>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="color:var(--danger);">Ketik <strong>RESET</strong> untuk konfirmasi</label>
+      <input class="form-input" id="m-reset-konfirmasi" placeholder="Ketik RESET di sini..." style="border-color:var(--danger);letter-spacing:.08em;font-weight:600;">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password Admin Anda</label>
+      <input class="form-input" id="m-reset-password" type="password" placeholder="Masukkan password admin...">
+    </div>
+    <div style="font-size:.78rem;color:var(--text3);margin-bottom:1rem;">Setelah reset, semua data diganti dengan data contoh bawaan sistem.</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal — Jangan Reset</button>
+      <button class="btn" style="background:var(--danger);color:#fff;" onclick="doResetData()">Hapus Semua Data</button>
+    </div>`);
+}
+function doResetData() {
+  const konfirmasi = (document.getElementById('m-reset-konfirmasi')?.value || '').trim();
+  const password   = (document.getElementById('m-reset-password')?.value || '').trim();
+  if (konfirmasi !== 'RESET') { alert('Konfirmasi salah. Ketik tepat: RESET (huruf kapital semua)'); return; }
+  if (!currentUser || password !== currentUser.password) { alert('Password admin salah. Reset dibatalkan.'); return; }
+  closeModal();
+  localStorage.removeItem('siSkripsi_data');
+  sessionStorage.removeItem('siSkripsi_session');
+  appData = { users:{}, skripsi:{}, bimbingan:{}, dokumen:{}, sidang:{}, nilai:{} };
+  initDefaultData(); saveLocal();
+  if (firebaseRef) { firebaseRef.remove(() => { firebaseRef.set(appData, () => { window.location.reload(); }); }); }
+  else { window.location.reload(); }
+}
+function resetData() { showResetConfirm(); }
+
+// ═══════════════════════════════════════
+// FIREBASE CONFIG (hardcoded)
+// ═══════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAs1Q8c75vpsDFl9XDb_AYVPRrShDE4WmA",
+  authDomain: "siskripsi.firebaseapp.com",
+  databaseURL: "https://siskripsi-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "siskripsi",
+  storageBucket: "siskripsi.firebasestorage.app",
+  messagingSenderId: "687197366375",
+  appId: "1:687197366375:web:c222a37a6075d6d9b14cc2"
+};
+
+// ═══════════════════════════════════════
+// FIREBASE
+// ═══════════════════════════════════════
+function connectFirebase() {
+  const apiKey = document.getElementById('fb-apikey').value.trim() || FIREBASE_CONFIG.apiKey;
+  const dbURL  = document.getElementById('fb-dburl').value.trim() || FIREBASE_CONFIG.databaseURL;
+  const projId = document.getElementById('fb-projectid').value.trim() || FIREBASE_CONFIG.projectId;
+  const authDom= document.getElementById('fb-authdomain').value.trim() || FIREBASE_CONFIG.authDomain;
+  document.getElementById('fb-status').textContent = 'Menghubungkan...';
+  loadFirebaseSDK({ apiKey, databaseURL: dbURL, projectId: projId, authDomain: authDom });
+}
+
+function loadFirebaseSDK(cfg) {
+  const script = document.createElement('script');
+  script.src = 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js';
+  script.onload = () => {
+    const s2 = document.createElement('script');
+    s2.src = 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js';
+    s2.onload = () => {
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(cfg);
+        DB = firebase.database();
+        firebaseRef = DB.ref('siSkripsi');
+        const statusEl = document.getElementById('fb-status');
+        if (statusEl) statusEl.textContent = '✅ Berhasil terhubung ke Firebase!';
+        if (window._fbTimeout) { clearTimeout(window._fbTimeout); window._fbTimeout = null; }
+        let _initialLoad = true;
+        firebaseRef.on('value', snap => {
+          let needsReset = true;
+          if (snap.exists()) {
+            try {
+              const d = snap.val();
+              // Data valid jika punya users (walau versi lama) — migrasi otomatis
+              if (d && d.users && Object.keys(d.users).length > 0) {
+                appData = migrasiData(d);
+                needsReset = false;
+                // Jika versi lama, simpan kembali hasil migrasi ke Firebase
+                if ((d._version || 0) < DATA_VERSION) {
+                  firebaseRef.set(appData);
+                }
+              }
+            } catch(err) {
+              console.error('Error parsing Firebase data:', err);
+              needsReset = true;
+            }
+          }
+          if (needsReset && _initialLoad) {
+            console.warn('Firebase kosong atau tidak valid, inisialisasi data default.');
+            appData = { users:{}, skripsi:{}, bimbingan:{}, dokumen:{}, sidang:{}, nilai:{} };
+            initDefaultData();
+            firebaseRef.set(appData);
+          }
+          // Hapus localStorage lama agar tidak menimpa data Firebase
+          localStorage.removeItem('siSkripsi_data');
+
+          if (_initialLoad) {
+            _initialLoad = false;
+            const ac = document.getElementById('auto-connecting');
+            if (ac) ac.remove();
+            if (!restoreSession()) showLogin();
+          } else if (!_suppressRerender) {
+            // Update real-time: re-render halaman aktif jika ada perubahan dari user lain
+            if (currentUser) {
+              const activeNav = document.querySelector('.nav-item.active');
+              const modalOpen = document.getElementById('modal-container').innerHTML.trim() !== '';
+              if (activeNav && activeNav.dataset.page && !modalOpen) {
+                navigate_noact(activeNav.dataset.page);
+              }
+            }
+          }
+        });
+      } catch(e) {
+        if (window._fbTimeout) { clearTimeout(window._fbTimeout); window._fbTimeout = null; }
+        const statusEl = document.getElementById('fb-status');
+        if (statusEl) statusEl.textContent = '❌ Gagal: ' + e.message;
+        console.error('Firebase error:', e);
+        // Fallback ke offline jika koneksi gagal
+        if (!loadLocal()) initDefaultData();
+        const ac = document.getElementById('auto-connecting');
+        if (ac) ac.remove();
+        if (!restoreSession()) showLogin();
+      }
+    };
+    s2.onerror = () => { if (window._fbTimeout) clearTimeout(window._fbTimeout); if (!loadLocal()) initDefaultData(); const ac=document.getElementById('auto-connecting'); if(ac)ac.remove(); if (!restoreSession()) showLogin(); };
+    document.head.appendChild(s2);
+  };
+  script.onerror = () => { if (window._fbTimeout) clearTimeout(window._fbTimeout); if (!loadLocal()) initDefaultData(); const ac=document.getElementById('auto-connecting'); if(ac)ac.remove(); if (!restoreSession()) showLogin(); };
+  document.head.appendChild(script);
+}
+
+function useOffline() {
+  localStorage.removeItem('siSkripsi_data'); // bersihkan cache lama
+  if (!loadLocal()) initDefaultData();
+  if (!restoreSession()) showLogin();
+}
+
+// Reset dari halaman login (sebelum masuk)
+function resetDataLogin() {
+  alert('Reset data hanya dapat dilakukan setelah login sebagai Administrator.');
+}
+
+// ═══════════════════════════════════════
+// AUTO-CONNECT saat halaman dimuat
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Tampilkan tombol reset login hanya jika username adalah 'admin'
+  const loginUserInput = document.getElementById('login-user');
+  if (loginUserInput) {
+    loginUserInput.addEventListener('input', function() {
+      const wrap = document.getElementById('login-reset-wrap');
+      if (wrap) wrap.style.display = this.value.trim() === 'admin' ? 'block' : 'none';
+    });
+  }
+  // Cek apakah dibuka dari file:// (tidak bisa pakai Firebase)
+  if (window.location.protocol === 'file:') {
+    document.getElementById('firebase-screen').style.display = 'none';
+    document.body.insertAdjacentHTML('afterbegin', `
+      <div id="auto-connecting" style="
+        position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:1rem;z-index:9999;padding:2rem;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:2rem;max-width:460px;width:100%;box-shadow:var(--shadow-lg);">
+          <div style="font-size:2rem;margin-bottom:.75rem;">⚠️</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;font-weight:600;color:var(--navy-700);margin-bottom:.5rem;">Tidak bisa terhubung ke Firebase</div>
+          <div style="font-size:.85rem;color:var(--text2);line-height:1.7;margin-bottom:1.25rem;">
+            File ini dibuka langsung dari folder komputer (<code>file://</code>), sehingga browser memblokir koneksi ke Firebase karena alasan keamanan.<br><br>
+            <strong>Solusi — pilih salah satu:</strong>
+            <ol style="margin:.75rem 0 0 1.25rem;display:flex;flex-direction:column;gap:.4rem;">
+              <li><strong>VS Code + Live Server</strong> (paling mudah): Install ekstensi <em>Live Server</em> di VS Code, klik kanan file → <em>Open with Live Server</em></li>
+              <li><strong>Upload ke hosting</strong>: Upload file ke Netlify, GitHub Pages, atau hosting lain</li>
+              <li><strong>Mode Offline</strong>: Gunakan tanpa Firebase (data tersimpan di browser saja)</li>
+            </ol>
+          </div>
+          <button onclick="useOffline(); document.getElementById('auto-connecting').remove();" style="width:100%;padding:.65rem;background:var(--navy-700);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:.875rem;font-weight:600;cursor:pointer;">
+            Lanjut Mode Offline (tanpa Firebase)
+          </button>
+        </div>
+      </div>`);
+    return;
+  }
+
+  // Sembunyikan firebase-screen, langsung koneksi otomatis
+  document.getElementById('firebase-screen').style.display = 'none';
+  // Tampilkan layar loading sementara
+  document.body.insertAdjacentHTML('afterbegin', `
+    <div id="auto-connecting" style="
+      position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:1rem;z-index:9999;">
+      <div style="width:48px;height:48px;background:var(--navy-700);border-radius:12px;
+        display:flex;align-items:center;justify-content:center;">
+        <svg width="26" height="26" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M12 2L2 19h20L12 2z"/><path d="M12 9v5M12 16h.01"/>
+        </svg>
+      </div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;font-weight:600;color:var(--navy-700);">SiSkripsi</div>
+      <div style="font-size:.85rem;color:var(--text2);">Menghubungkan ke Firebase...</div>
+      <div style="width:200px;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+        <div style="height:100%;background:var(--navy-700);border-radius:99px;width:0%;
+          animation:loadBar 2s ease-in-out forwards;" id="load-bar"></div>
+      </div>
+      <style>@keyframes loadBar{0%{width:0%}70%{width:80%}100%{width:95%}}</style>
+    </div>`);
+  // Timeout fallback: jika Firebase tidak berhasil dalam 8 detik, langsung offline
+  const firebaseTimeout = setTimeout(() => {
+    if (document.getElementById('auto-connecting')) {
+      console.warn('Firebase timeout, fallback ke offline');
+      if (!loadLocal()) initDefaultData();
+      const ac = document.getElementById('auto-connecting');
+      if (ac) ac.remove();
+      if (!restoreSession()) showLogin();
+    }
+  }, 8000);
+
+  // Simpan timeout id agar bisa dibatalkan jika Firebase berhasil
+  window._fbTimeout = firebaseTimeout;
+
+  // Koneksi otomatis dengan config hardcoded
+  loadFirebaseSDK(FIREBASE_CONFIG);
+});
+
+
+// ═══════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════
+function showLogin() {
+  const ac = document.getElementById('auto-connecting');
+  if (ac) ac.remove();
+  document.getElementById('firebase-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+function togglePwd(id, btn) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const user = appData.users[u];
+  if (!user || user.password !== p) {
+    document.getElementById('login-err').textContent = '❌ Username atau password salah.';
+    return;
+  }
+  currentUser = { ...user, username: u };
+  // Simpan sesi agar tidak logout saat refresh
+  sessionStorage.setItem('siSkripsi_session', JSON.stringify({ username: u }));
+  document.getElementById('login-err').textContent = '';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  setupSidebar();
+  renderDashboard();
+}
+function doLogout() {
+  currentUser = null;
+  sessionStorage.removeItem('siSkripsi_session');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// Pulihkan sesi setelah data appData selesai dimuat
+function restoreSession() {
+  const saved = sessionStorage.getItem('siSkripsi_session');
+  if (!saved) return false;
+  try {
+    const { username } = JSON.parse(saved);
+    const user = appData.users[username];
+    if (!user) return false; // user sudah dihapus
+    currentUser = { ...user, username };
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    setupSidebar();
+    renderDashboard();
+    return true;
+  } catch(e) {
+    sessionStorage.removeItem('siSkripsi_session');
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════
+function setupSidebar() {
+  const initials = currentUser.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('sidebar-avatar').textContent = initials;
+  document.getElementById('sidebar-name').textContent = currentUser.name;
+  const roleLabel = { admin:'Administrator', mahasiswa:'Mahasiswa', dosen:'Dosen Pembimbing' };
+  document.getElementById('sidebar-role').textContent = roleLabel[currentUser.role];
+
+  // Tampilkan tombol Reset Data hanya untuk admin
+  const btnReset = document.getElementById('btn-reset-data');
+  if (btnReset) btnReset.style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+
+  let navHTML = '';
+  const adminMenus = [
+    { label:'Dashboard', icon:iconDashboard, page:'dashboard' },
+    { section:'Manajemen' },
+    { label:'Data Mahasiswa', icon:iconUsers, page:'mhs-list' },
+    { label:'Data Dosen', icon:iconUser, page:'dsn-list' },
+    { label:'Semua Skripsi', icon:iconBook, page:'all-skripsi' },
+    { section:'Sidang' },
+    { label:'Jadwal Sidang', icon:iconCalendar, page:'jadwal-sidang' },
+    { section:'Pengaturan' },
+    { label:'Kelola Akun', icon:iconSettings, page:'kelola-akun' },
+  ];
+  const mahasiswaMenus = [
+    { label:'Dashboard', icon:iconDashboard, page:'dashboard' },
+    { section:'Skripsi Saya' },
+    { label:'Progres Skripsi', icon:iconProgress, page:'progres-skripsi' },
+    { label:'Pengajuan Judul', icon:iconBook, page:'pengajuan-judul' },
+    { label:'Logbook Bimbingan', icon:iconEdit, page:'logbook' },
+    { label:'Dokumen', icon:iconFile, page:'dokumen' },
+    { label:'Jadwal Sidang', icon:iconCalendar, page:'jadwal-sidang' },
+    { label:'Nilai Sidang', icon:iconStar, page:'nilai-saya' },
+    { section:'Akun' },
+    { label:'Ganti Password', icon:iconSettings, page:'kelola-akun' },
+  ];
+  const dosenMenus = [
+    { label:'Dashboard', icon:iconDashboard, page:'dashboard' },
+    { section:'Mahasiswa Bimbingan' },
+    { label:'Daftar Bimbingan', icon:iconUsers, page:'daftar-bimbingan' },
+    { label:'Logbook & Review', icon:iconEdit, page:'review-logbook' },
+    { label:'Dokumen Review', icon:iconFile, page:'review-dokumen' },
+    { label:'Update Progres', icon:iconProgress, page:'kelola-progres' },
+    { section:'Sidang' },
+    { label:'Jadwal Sidang', icon:iconCalendar, page:'jadwal-sidang' },
+    { label:'Input Nilai', icon:iconStar, page:'input-nilai' },
+    { section:'Akun' },
+    { label:'Ganti Password', icon:iconSettings, page:'kelola-akun' },
+  ];
+  const menus = { admin: adminMenus, mahasiswa: mahasiswaMenus, dosen: dosenMenus }[currentUser.role];
+  menus.forEach(m => {
+    if (m.section) { navHTML += `<div class="nav-section">${m.section}</div>`; }
+    else {
+      let notif = '';
+      if (currentUser.role === 'dosen') {
+        if (m.page === 'review-logbook') {
+          const cnt = Object.values(appData.bimbingan).filter(b => b.dosbingId === currentUser.id && b.status === 'menunggu').length;
+          if (cnt > 0) notif = `<span class="notif-dot" title="${cnt} menunggu"></span>`;
+        }
+        if (m.page === 'review-dokumen') {
+          const dosBimbingIds = getDosenBimbingan(currentUser.id).map(s => s.id);
+          const cnt = Object.values(appData.dokumen).filter(d => dosBimbingIds.includes(d.skripsiId) && d.status === 'review').length;
+          if (cnt > 0) notif = `<span class="notif-dot" title="${cnt} menunggu"></span>`;
+        }
+      }
+      if (currentUser.role === 'mahasiswa') {
+        if (m.page === 'logbook') {
+          const sk = getMhsSkripsi(currentUser.id);
+          if (sk) {
+            const cnt = Object.values(appData.bimbingan).filter(b => b.skripsiId === sk.id && b.status === 'revisi' && b.catatanDosen).length;
+            if (cnt > 0) notif = `<span class="notif-dot" title="${cnt} perlu perbaikan"></span>`;
+          }
+        }
+        if (m.page === 'dokumen') {
+          const sk = getMhsSkripsi(currentUser.id);
+          if (sk) {
+            const cnt = Object.values(appData.dokumen).filter(d => d.skripsiId === sk.id && d.status === 'revisi' && d.catatanDosen).length;
+            if (cnt > 0) notif = `<span class="notif-dot" title="${cnt} perlu perbaikan"></span>`;
+          }
+        }
+      }
+      navHTML += `<div class="nav-item" data-page="${m.page}" onclick="navigate('${m.page}')">${m.icon()}<span>${m.label}</span>${notif}</div>`;
+    }
+  });
+  document.getElementById('sidebar-nav').innerHTML = navHTML;
+}
+
+function navigate(page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+  const mc = document.getElementById('main-content');
+  const pages = {
+    'dashboard': renderDashboard,
+    'progres-skripsi': renderProgesSkripsi,
+    'pengajuan-judul': renderPengajuanJudul,
+    'logbook': renderLogbook,
+    'dokumen': renderDokumen,
+    'jadwal-sidang': renderJadwalSidang,
+    'nilai-saya': renderNilaiSaya,
+    'daftar-bimbingan': renderDaftarBimbingan,
+    'review-logbook': renderReviewLogbook,
+    'review-dokumen': renderReviewDokumen,
+    'kelola-progres': renderKelolaProgres,
+    'input-nilai': renderInputNilai,
+    'mhs-list': renderMhsList,
+    'dsn-list': renderDsnList,
+    'all-skripsi': renderAllSkripsi,
+    'kelola-akun': renderKelolaAkun,
+  };
+  if (pages[page]) pages[page]();
+}
+function renderDashboard() { navigate_noact('dashboard'); }
+function navigate_noact(page) {
+  const pages = {
+    'dashboard': _renderDashboard,
+    'progres-skripsi': renderProgesSkripsi,
+    'pengajuan-judul': renderPengajuanJudul,
+    'logbook': renderLogbook,
+    'dokumen': renderDokumen,
+    'jadwal-sidang': renderJadwalSidang,
+    'nilai-saya': renderNilaiSaya,
+    'daftar-bimbingan': renderDaftarBimbingan,
+    'review-logbook': renderReviewLogbook,
+    'review-dokumen': renderReviewDokumen,
+    'kelola-progres': renderKelolaProgres,
+    'input-nilai': renderInputNilai,
+    'mhs-list': renderMhsList,
+    'dsn-list': renderDsnList,
+    'all-skripsi': renderAllSkripsi,
+    'kelola-akun': renderKelolaAkun,
+  };
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+  if (pages[page]) pages[page]();
+}
+
+// ═══════════════════════════════════════
+// ICONS (SVG inline)
+// ═══════════════════════════════════════
+function svgIcon(path, extra='') { return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${path}</svg>`; }
+function iconDashboard() { return svgIcon('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>'); }
+function iconBook()      { return svgIcon('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'); }
+function iconEdit()      { return svgIcon('<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'); }
+function iconFile()      { return svgIcon('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>'); }
+function iconCalendar()  { return svgIcon('<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'); }
+function iconStar()      { return svgIcon('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'); }
+function iconUsers()     { return svgIcon('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'); }
+function iconUser()      { return svgIcon('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'); }
+function iconProgress()  { return svgIcon('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'); }
+function iconSettings()  { return svgIcon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'); }
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function statusBadge(s) {
+  const map = {
+    'pengajuan':            ['badge-amber','Pengajuan Judul'],
+    'disetujui':            ['badge-green','Disetujui'],
+    'ditolak':              ['badge-red','Ditolak'],
+    'bimbingan':            ['badge-blue','Bimbingan'],
+    'sidang':               ['badge-amber','Siap Sidang'],
+    'selesai':              ['badge-green','Selesai'],
+    'revisi':               ['badge-red','Perlu Revisi'],
+    'review':               ['badge-amber','Dalam Review'],
+    'terjadwal':            ['badge-blue','Terjadwal'],
+    'lulus':                ['badge-green','Lulus'],
+    'menunggu':             ['badge-gray','Menunggu'],
+    // tahapan progres skripsi
+    'acc_judul':            ['badge-green','Acc Judul'],
+    'bimbingan_aktif':      ['badge-blue','Bimbingan'],
+    'bimbingan_proposal':   ['badge-blue','Bimbingan Proposal'],
+    'acc_sempro':           ['badge-green','Acc Seminar Proposal'],
+    'sempro':               ['badge-amber','Seminar Proposal'],
+    'perbaikan_proposal':   ['badge-red','Perbaikan Proposal'],
+    'bimbingan_skripsi':    ['badge-blue','Bimbingan Skripsi'],
+    'bimbingan_perbaikan1': ['badge-blue','Bimbingan Perbaikan'],
+    'acc_semhas':           ['badge-green','Acc Seminar Hasil'],
+    'semhas':               ['badge-amber','Seminar Hasil'],
+    'perbaikan_hasil':      ['badge-red','Perbaikan Hasil'],
+    'cek_plagiarisme':      ['badge-amber','Cek Plagiarisme'],
+    'bimbingan_perbaikan2': ['badge-blue','Bimbingan Perbaikan'],
+    'acc_ujian':            ['badge-green','Acc Ujian Skripsi'],
+    'ujian_skripsi':        ['badge-amber','Ujian Skripsi'],
+    'perbaikan_ujian':      ['badge-red','Perbaikan Ujian'],
+    'yudisium':             ['badge-blue','Yudisium'],
+    'wisuda':               ['badge-green','Selesai / Wisuda'],
+  };
+  const [cls, lbl] = map[s] || ['badge-gray', s];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+function getMhsSkripsi(mhsId) {
+  return Object.values(appData.skripsi).find(s => s.mahasiswaId === mhsId);
+}
+function getDosenBimbingan(dosenId) {
+  return Object.values(appData.skripsi).filter(s => s.dosbingId === dosenId || s.dosbingId2 === dosenId);
+}
+function getSkripsiLogbook(skripsiId) {
+  return Object.values(appData.bimbingan).filter(b => b.skripsiId === skripsiId).sort((a,b)=>b.tanggal.localeCompare(a.tanggal));
+}
+function getSkripsiDokumen(skripsiId) {
+  return Object.values(appData.dokumen).filter(d => d.skripsiId === skripsiId);
+}
+function progressPercent(status) {
+  const map = {
+    'pengajuan':            6,
+    'acc_judul':            12,
+    'bimbingan_proposal':   18,
+    'bimbingan_aktif':      18,
+    'bimbingan':            18,
+    'disetujui':            12,
+    'acc_sempro':           24,
+    'sempro':               30,
+    'perbaikan_proposal':   36,
+    'bimbingan_skripsi':    42,
+    'bimbingan_perbaikan1': 42,
+    'acc_semhas':           48,
+    'semhas':               54,
+    'perbaikan_hasil':      60,
+    'cek_plagiarisme':      66,
+    'bimbingan_perbaikan2': 66,
+    'acc_ujian':            72,
+    'ujian_skripsi':        80,
+    'sidang':               80,
+    'perbaikan_ujian':      88,
+    'yudisium':             94,
+    'wisuda':               100,
+    'selesai':              100,
+  };
+  return map[status] || 0;
+}
+
+// Definisi 16 tahapan progres skripsi
+const TAHAPAN = [
+  { key:'pengajuan',            label:'Pengajuan Judul',        short:'Pengajuan' },
+  { key:'acc_judul',            label:'Acc Judul',              short:'Acc Judul' },
+  { key:'bimbingan_proposal',   label:'Bimbingan Proposal',     short:'Bimb. Proposal' },
+  { key:'acc_sempro',           label:'Acc Seminar Proposal',   short:'Acc Sempro' },
+  { key:'sempro',               label:'Seminar Proposal',       short:'Sempro' },
+  { key:'perbaikan_proposal',   label:'Perbaikan Proposal',     short:'Perb. Proposal' },
+  { key:'bimbingan_skripsi',    label:'Bimbingan Skripsi',      short:'Bimb. Skripsi' },
+  { key:'acc_semhas',           label:'Acc Seminar Hasil',      short:'Acc Semhas' },
+  { key:'semhas',               label:'Seminar Hasil',          short:'Semhas' },
+  { key:'perbaikan_hasil',      label:'Perbaikan Hasil',        short:'Perb. Hasil' },
+  { key:'cek_plagiarisme',      label:'Cek Plagiarisme',        short:'Plagiarisme' },
+  { key:'acc_ujian',            label:'Acc Ujian Skripsi',      short:'Acc Ujian' },
+  { key:'ujian_skripsi',        label:'Ujian Skripsi',          short:'Ujian' },
+  { key:'perbaikan_ujian',      label:'Perbaikan Ujian',        short:'Perb. Ujian' },
+  { key:'yudisium',             label:'Yudisium',               short:'Yudisium' },
+  { key:'wisuda',               label:'Wisuda',                 short:'Wisuda' },
+];
+
+function tahapanIndex(status) {
+  // mapping status lama ke tahapan baru
+  const alias = { bimbingan:'bimbingan_proposal', bimbingan_aktif:'bimbingan_proposal', disetujui:'acc_judul', sidang:'ujian_skripsi', selesai:'wisuda', bimbingan_perbaikan1:'perbaikan_proposal', bimbingan_perbaikan2:'perbaikan_hasil' };
+  const s = alias[status] || status;
+  return TAHAPAN.findIndex(t => t.key === s);
+}
+
+function renderProgresBar(status) {
+  const cur = tahapanIndex(status);
+  const pct = progressPercent(status);
+  const rows = TAHAPAN.map((t, i) => {
+    const done = i < cur;
+    const active = i === cur;
+    const cls = done ? 'done' : active ? 'active' : 'pending';
+    const color = done ? 'var(--navy-600)' : active ? 'var(--warning)' : 'var(--text3)';
+    return `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--border);last-child:border-none;">
+      <div style="width:22px;height:22px;border-radius:50%;background:${done?'var(--navy-600)':active?'var(--warning-light)':'var(--surface2)'};
+        border:2px solid ${done?'var(--navy-600)':active?'var(--warning)':'var(--border)'};
+        display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.62rem;font-weight:700;color:${done?'#fff':active?'var(--warning)':'var(--text3)'};">
+        ${done?'✓':i+1}
+      </div>
+      <span style="font-size:.82rem;font-weight:${active?'700':'500'};color:${active?'var(--text)':'var(--text2)'};">${t.label}</span>
+      ${active?`<span style="margin-left:auto;">${statusBadge(status)}</span>`:''}
+    </div>`;
+  }).join('');
+  return `<div>
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+      <div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <span style="font-size:.83rem;font-weight:700;color:var(--navy-700);min-width:32px;">${pct}%</span>
+    </div>
+    <div style="margin-top:.5rem;">${rows}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function _renderDashboard() {
+  const mc = document.getElementById('main-content');
+  const role = currentUser.role;
+
+  if (role === 'admin') {
+    const totalMhs = Object.values(appData.users).filter(u=>u.role==='mahasiswa').length;
+    const totalDsn = Object.values(appData.users).filter(u=>u.role==='dosen').length;
+    const totalSkripsi = Object.values(appData.skripsi).length;
+    const siapSidang = Object.values(appData.skripsi).filter(s=>s.status==='acc_ujian'||s.status==='ujian_skripsi').length;
+    mc.innerHTML = `
+      <div class="page-header">
+        <h1>Dashboard Admin</h1>
+        <p>Selamat datang, ${currentUser.name}. Berikut ringkasan sistem.</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">Total Mahasiswa</div><div class="stat-value">${totalMhs}</div><div class="stat-desc">Terdaftar di sistem</div></div>
+        <div class="stat-card blue"><div class="stat-label">Total Dosen</div><div class="stat-value">${totalDsn}</div><div class="stat-desc">Pembimbing aktif</div></div>
+        <div class="stat-card"><div class="stat-label">Total Skripsi</div><div class="stat-value">${totalSkripsi}</div><div class="stat-desc">Semua status</div></div>
+        <div class="stat-card amber"><div class="stat-label">Siap Sidang</div><div class="stat-value">${siapSidang}</div><div class="stat-desc">Menunggu jadwal</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Skripsi Berdasarkan Tahapan</div>
+          ${(() => {
+            const allStatuses = [...TAHAPAN.map(t=>t.key), 'pengajuan', 'ditolak'];
+            const unique = [...new Set(allStatuses)];
+            return unique.map(s => {
+              const n = Object.values(appData.skripsi).filter(sk=>sk.status===s).length;
+              if (!n) return '';
+              const pct = totalSkripsi ? Math.round(n/totalSkripsi*100) : 0;
+              return `<div style="margin-bottom:.75rem;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;font-size:.83rem;">
+                  <span>${statusBadge(s)}</span><span style="color:var(--text2);">${n}</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+              </div>`;
+            }).join('');
+          })()}
+        </div>
+        <div class="card">
+          <div class="card-title">Aktivitas Terbaru</div>
+          <div class="timeline">
+            ${Object.values(appData.bimbingan).slice(-4).reverse().map(b => {
+              const mhs = appData.users[b.mahasiswaId];
+              return `<div class="tl-item"><div class="tl-dot"></div>
+                <div class="tl-date">${b.tanggal}</div>
+                <div class="tl-content"><strong>${mhs ? mhs.name : '-'}</strong><p>${b.topik}</p>${statusBadge(b.status)}</div>
+              </div>`;
+            }).join('') || '<div class="empty-state"><p>Belum ada aktivitas</p></div>'}
+          </div>
+        </div>
+      </div>`;
+
+  } else if (role === 'mahasiswa') {
+    const skripsi = getMhsSkripsi(currentUser.id);
+    const logbooks = skripsi ? getSkripsiLogbook(skripsi.id) : [];
+    const dokumen = skripsi ? getSkripsiDokumen(skripsi.id) : [];
+    const dosbing = skripsi ? appData.users[skripsi.dosbingId] : null;
+    const dosbing2 = skripsi ? appData.users[skripsi.dosbingId2] : null;
+    mc.innerHTML = `
+      <div class="page-header">
+        <h1>Dashboard Mahasiswa</h1>
+        <p>Selamat datang, ${currentUser.name} — NIM: ${currentUser.nim}</p>
+      </div>
+      ${!skripsi ? `
+        <div class="info-box amber">Anda belum mengajukan judul skripsi. <strong onclick="navigate('pengajuan-judul')" style="cursor:pointer;text-decoration:underline;">Ajukan sekarang →</strong></div>
+      ` : `
+        <div class="stats-grid">
+          <div class="stat-card green"><div class="stat-label">Status</div><div class="stat-value" style="font-size:1.1rem;padding-top:.25rem;">${statusBadge(skripsi.status)}</div><div class="stat-desc">Progres skripsi</div></div>
+          <div class="stat-card blue"><div class="stat-label">Bimbingan</div><div class="stat-value">${logbooks.length}</div><div class="stat-desc">Sesi tercatat</div></div>
+          <div class="stat-card"><div class="stat-label">Dokumen</div><div class="stat-value">${dokumen.length}</div><div class="stat-desc">File diunggah</div></div>
+          <div class="stat-card amber"><div class="stat-label">Pembimbing 1</div><div class="stat-value" style="font-size:.85rem;padding-top:.4rem;">${dosbing ? dosbing.name.split(',')[0] : '-'}</div><div class="stat-desc">&nbsp;</div></div>
+          <div class="stat-card amber"><div class="stat-label">Pembimbing 2</div><div class="stat-value" style="font-size:.85rem;padding-top:.4rem;">${dosbing2 ? dosbing2.name.split(',')[0] : '-'}</div><div class="stat-desc">&nbsp;</div></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-title">Progres Skripsi</div>
+          <div style="margin-bottom:.5rem;"><strong style="font-size:.875rem;">${skripsi.judul}</strong></div>
+          ${renderProgresBar(skripsi.status)}
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Bimbingan Terbaru</div>
+            <div class="timeline">
+              ${logbooks.slice(0,3).map(b => `<div class="tl-item"><div class="tl-dot"></div>
+                <div class="tl-date">${b.tanggal}</div>
+                <div class="tl-content"><strong>${b.topik}</strong><p>${b.catatan.slice(0,80)}${b.catatan.length>80?'...':''}</p>${statusBadge(b.status)}</div>
+              </div>`).join('') || '<div class="empty-state"><p>Belum ada bimbingan</p></div>'}
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Dokumen Terbaru</div>
+            ${dokumen.slice(0,3).map(d => `<div class="file-item">
+              <div class="file-icon">PDF</div>
+              <div><div class="file-name">${d.nama}</div><div class="file-meta">${d.tglUpload} · ${statusBadge(d.status)}</div></div>
+            </div>`).join('') || '<div class="empty-state"><p>Belum ada dokumen</p></div>'}
+          </div>
+        </div>
+      `}`;
+
+  } else { // dosen
+    const bimbingans = getDosenBimbingan(currentUser.id);
+    const totalMhsBim = bimbingans.length;
+    const logbooksAll = Object.values(appData.bimbingan).filter(b=>b.dosbingId===currentUser.id);
+    mc.innerHTML = `
+      <div class="page-header">
+        <h1>Dashboard Dosen</h1>
+        <p>Selamat datang, ${currentUser.name}</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">Mhs. Bimbingan</div><div class="stat-value">${totalMhsBim}</div><div class="stat-desc">Aktif dibimbing</div></div>
+        <div class="stat-card blue"><div class="stat-label">Total Bimbingan</div><div class="stat-value">${logbooksAll.length}</div><div class="stat-desc">Sesi tercatat</div></div>
+        <div class="stat-card amber"><div class="stat-label">Perlu Revisi</div><div class="stat-value">${logbooksAll.filter(b=>b.status==='revisi').length}</div><div class="stat-desc">Belum ditindaklanjuti</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Mahasiswa Bimbingan</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Mahasiswa</th><th>Judul</th><th>Tahapan</th><th>Progres</th><th>Sesi Bimbingan</th></tr></thead>
+            <tbody>
+              ${bimbingans.map(sk => {
+                const mhs = appData.users[sk.mahasiswaId];
+                const lb = getSkripsiLogbook(sk.id);
+                const pct = progressPercent(sk.status);
+                return `<tr>
+                  <td><strong>${mhs ? mhs.name : '-'}</strong><br><span style="font-size:.72rem;color:var(--text3);">${mhs ? mhs.nim : ''}</span></td>
+                  <td style="max-width:200px;">${sk.judul}</td>
+                  <td>${statusBadge(sk.status)}</td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:.4rem;min-width:80px;">
+                      <div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:${pct}%"></div></div>
+                      <span style="font-size:.72rem;font-weight:700;color:var(--navy-700);">${pct}%</span>
+                    </div>
+                  </td>
+                  <td>${lb.length}</td>
+                </tr>`;
+              }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text3);">Belum ada mahasiswa bimbingan</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+}
+
+// ═══════════════════════════════════════
+// MAHASISWA: PENGAJUAN JUDUL
+// ═══════════════════════════════════════
+function renderPengajuanJudul() {
+  const mc = document.getElementById('main-content');
+  const skripsi = getMhsSkripsi(currentUser.id);
+  mc.innerHTML = `
+    <div class="page-header"><h1>Pengajuan Judul Skripsi</h1><p>Ajukan judul skripsi dan tunggu persetujuan dosen pembimbing</p></div>
+    ${skripsi ? `
+      <div class="info-box ${skripsi.status==='ditolak'?'red':['acc_judul','bimbingan_aktif','acc_sempro','sempro','bimbingan_perbaikan1','acc_semhas','semhas','bimbingan_perbaikan2','acc_ujian','ujian_skripsi','wisuda','bimbingan','disetujui'].includes(skripsi.status)?'green':'amber'}">
+        ${skripsi.status==='pengajuan'?'⏳ Judul Anda sedang dalam proses review oleh dosen pembimbing.':
+          skripsi.status==='ditolak'?'❌ Judul ditolak. Silakan revisi dan ajukan ulang.':
+          skripsi.status==='acc_judul'?'✅ Judul disetujui! Silakan mulai proses bimbingan.':
+          '✅ Proses skripsi sedang berjalan — '+( TAHAPAN.find(t=>t.key===skripsi.status)?.label || skripsi.status)+'.'}
+        ${skripsi.catatan ? `<br><em>Catatan: ${skripsi.catatan}</em>` : ''}
+      </div>
+      <div class="card">
+        <div class="card-title">Detail Pengajuan</div>
+        <div style="display:grid;gap:.75rem;">
+          <div><span style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Judul Skripsi</span><p style="margin-top:.3rem;font-weight:600;">${skripsi.judul}</p></div>
+          <div><span style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Status</span><p style="margin-top:.3rem;">${statusBadge(skripsi.status)}</p></div>
+          <div><span style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Tanggal Pengajuan</span><p style="margin-top:.3rem;">${skripsi.tglPengajuan}</p></div>
+          <div><span style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Dosen Pembimbing 1</span><p style="margin-top:.3rem;">${appData.users[skripsi.dosbingId]?.name || '-'}</p></div>
+          <div><span style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Dosen Pembimbing 2</span><p style="margin-top:.3rem;">${appData.users[skripsi.dosbingId2]?.name || '-'}</p></div>
+        </div>
+        ${skripsi.status==='ditolak'?`<button class="btn btn-amber" style="margin-top:1rem;" onclick="showAjukanJudul(true)">Ajukan Ulang</button>`:''}
+      </div>
+    ` : `
+      <div class="card" style="max-width:560px;">
+        <div class="card-title">Form Pengajuan Judul</div>
+        <div class="form-group">
+          <label class="form-label">Judul Skripsi</label>
+          <input class="form-input" id="judul-input" placeholder="Masukkan judul skripsi yang diusulkan">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deskripsi Singkat / Latar Belakang</label>
+          <textarea class="form-textarea" id="desc-input" placeholder="Jelaskan secara singkat topik dan latar belakang skripsi Anda..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pilih Dosen Pembimbing 1</label>
+          <select class="form-select" id="dosbing-select">
+            <option value="">-- Pilih Dosen --</option>
+            ${Object.values(appData.users).filter(u=>u.role==='dosen').map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pilih Dosen Pembimbing 2</label>
+          <select class="form-select" id="dosbing2-select">
+            <option value="">-- Pilih Dosen --</option>
+            ${Object.values(appData.users).filter(u=>u.role==='dosen').map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn btn-green" onclick="submitPengajuan()">Ajukan Judul</button>
+      </div>
+    `}`;
+}
+
+function submitPengajuan() {
+  const judul = document.getElementById('judul-input').value.trim();
+  const dosbingId = document.getElementById('dosbing-select').value;
+  const dosbingId2 = document.getElementById('dosbing2-select').value;
+  if (!judul || !dosbingId) { alert('Judul dan dosen pembimbing wajib diisi!'); return; }
+  const id = genId('s');
+  const tgl = new Date().toISOString().slice(0,10);
+  appData.skripsi[id] = {
+    id, mahasiswaId: currentUser.id, judul, status:'pengajuan',
+    tglPengajuan: tgl, dosbingId, dosbingId2, catatan:'',
+    riwayatProgres: [{ status:'pengajuan', tanggal: tgl, catatan:'Judul diajukan', oleh: currentUser.name }]
+  };
+  appData.users[currentUser.username].dosbingId = dosbingId;
+  appData.users[currentUser.username].dosbingId2 = dosbingId2;
+  saveData();
+  renderPengajuanJudul();
+}
+
+// Ajukan ulang judul setelah ditolak
+function showAjukanJudul(isRevisi = false) {
+  const skripsi = isRevisi ? getMhsSkripsi(currentUser.id) : null;
+  openModal(`
+    <h2>${isRevisi ? '🔄 Ajukan Ulang Judul' : '📋 Pengajuan Judul'}</h2>
+    ${isRevisi ? `<div class="info-box amber" style="margin-bottom:1rem;">Judul sebelumnya: <strong>${skripsi?.judul || '-'}</strong><br><small>Revisi dan ajukan kembali di bawah ini.</small></div>` : ''}
+    <div class="form-group">
+      <label class="form-label">Judul Skripsi</label>
+      <input class="form-input" id="m-judul-ulang" placeholder="Masukkan judul skripsi" value="${isRevisi && skripsi ? skripsi.judul : ''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Deskripsi Singkat</label>
+      <textarea class="form-textarea" id="m-desc-ulang" placeholder="Jelaskan latar belakang singkat..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Dosen Pembimbing 1</label>
+      <select class="form-select" id="m-dosbing-ulang">
+        <option value="">-- Pilih Dosen --</option>
+        ${Object.values(appData.users).filter(u=>u.role==='dosen').map(d=>`<option value="${d.id}" ${isRevisi&&skripsi&&skripsi.dosbingId===d.id?'selected':''}>${d.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Dosen Pembimbing 2 (opsional)</label>
+      <select class="form-select" id="m-dosbing2-ulang">
+        <option value="">-- Pilih Dosen --</option>
+        ${Object.values(appData.users).filter(u=>u.role==='dosen').map(d=>`<option value="${d.id}" ${isRevisi&&skripsi&&skripsi.dosbingId2===d.id?'selected':''}>${d.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitAjukanUlang()">📤 Ajukan</button>
+    </div>`);
+}
+
+function submitAjukanUlang() {
+  const judul = document.getElementById('m-judul-ulang').value.trim();
+  const dosbingId = document.getElementById('m-dosbing-ulang').value;
+  const dosbingId2 = document.getElementById('m-dosbing2-ulang').value;
+  if (!judul || !dosbingId) { alert('Judul dan dosen pembimbing wajib diisi!'); return; }
+  const skripsi = getMhsSkripsi(currentUser.id);
+  const tgl = new Date().toISOString().slice(0,10);
+  if (skripsi && skripsi.status === 'ditolak') {
+    // Update skripsi yang sudah ada
+    skripsi.judul = judul;
+    skripsi.status = 'pengajuan';
+    skripsi.dosbingId = dosbingId;
+    skripsi.dosbingId2 = dosbingId2;
+    skripsi.catatan = '';
+    if (!skripsi.riwayatProgres) skripsi.riwayatProgres = [];
+    skripsi.riwayatProgres.push({ status:'pengajuan', tanggal: tgl, catatan:'Judul diajukan ulang setelah revisi', oleh: currentUser.name });
+  } else {
+    // Buat baru
+    const id = genId('s');
+    appData.skripsi[id] = {
+      id, mahasiswaId: currentUser.id, judul, status:'pengajuan',
+      tglPengajuan: tgl, dosbingId, dosbingId2, catatan:'',
+      riwayatProgres: [{ status:'pengajuan', tanggal: tgl, catatan:'Judul diajukan', oleh: currentUser.name }]
+    };
+  }
+  appData.users[currentUser.username].dosbingId = dosbingId;
+  appData.users[currentUser.username].dosbingId2 = dosbingId2;
+  saveData();
+  closeModal();
+  renderPengajuanJudul();
+}
+
+// ═══════════════════════════════════════
+// MAHASISWA: LOGBOOK
+// ═══════════════════════════════════════
+function renderLogbook() {
+  const mc = document.getElementById('main-content');
+  const skripsi = getMhsSkripsi(currentUser.id);
+  if (!skripsi) { mc.innerHTML = `<div class="page-header"><h1>Logbook Bimbingan</h1></div><div class="info-box amber">Anda belum mengajukan judul skripsi.</div>`; return; }
+  if (skripsi.status === 'ditolak') { mc.innerHTML = `<div class="page-header"><h1>Logbook Bimbingan</h1></div><div class="info-box red">Judul ditolak. Silakan ajukan ulang judul skripsi.</div>`; return; }
+  const logbooks = getSkripsiLogbook(skripsi.id);
+  const adaCatatanBelumDibaca = logbooks.some(b => b.catatanDosen && b.status === 'revisi' && !b.sudahDibaca);
+  const jmlManual = logbooks.filter(b => !b.tipeEntri).length;
+  const jmlSistem = logbooks.filter(b => b.tipeEntri === 'sistem').length;
+  const jmlDokumen = logbooks.filter(b => b.tipeEntri === 'dokumen' || b.sumberDokumen).length;
+  mc.innerHTML = `
+    <div class="page-header"><h1>Logbook Bimbingan</h1><p>Catatan sesi bimbingan dengan dosen pembimbing</p></div>
+    ${adaCatatanBelumDibaca ? `<div class="info-box amber" style="margin-bottom:1rem;">⚠️ Ada <strong>catatan perbaikan</strong> dari dosen yang perlu Anda tindaklanjuti. Lihat entri bertanda <span style="color:var(--danger);font-weight:700;">Perlu Perbaikan</span> di bawah.</div>` : ''}
+    <div class="action-bar">
+      <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+        <span style="font-size:.875rem;color:var(--text2);"><strong>${logbooks.length}</strong> entri total</span>
+        <span style="font-size:.8rem;color:var(--text3);">· ${jmlManual} manual · ${jmlSistem} sistem · ${jmlDokumen} dokumen</span>
+      </div>
+      <div style="display:flex;gap:.5rem;">
+        <button class="btn btn-ghost" onclick="showKartuBimbingan('${skripsi.id}')">🖨️ Cetak Kartu Bimbingan</button>
+        <button class="btn btn-green" onclick="showModalLogbook()">+ Catat Bimbingan</button>
+      </div>
+    </div>
+    ${logbooks.length === 0 ? '<div class="empty-state"><div class="icon">📝</div><p>Belum ada catatan bimbingan</p></div>' : `
+      <div class="timeline">
+        ${logbooks.map(b => {
+          const isDokReview = !!b.sumberDokumen;
+          const isSistem = b.tipeEntri === 'sistem';
+          const isDokUpload = b.tipeEntri === 'dokumen';
+          const dotColor = b.status==='revisi'?'var(--danger)':b.status==='selesai'?'var(--navy-600)':'var(--warning)';
+          const tagLabel = isSistem ? '⚙️ Otomatis' : isDokUpload ? '📎 Dokumen' : isDokReview ? '📄 Review Dok.' : '✍️ Manual';
+          const tagColor = isSistem ? 'var(--info)' : isDokUpload ? 'var(--warning)' : isDokReview ? 'var(--info)' : 'var(--navy-600)';
+          const tagBg = isSistem ? 'var(--info-light)' : isDokUpload ? 'var(--warning-light)' : isDokReview ? 'var(--info-light)' : 'var(--navy-50)';
+          return `<div class="tl-item"><div class="tl-dot" style="background:${dotColor}"></div>
+            <div class="tl-date">${b.tanggal} &nbsp;<span style="font-size:.7rem;background:${tagBg};color:${tagColor};padding:.1rem .5rem;border-radius:4px;font-weight:600;">${tagLabel}</span></div>
+            <div class="tl-content">
+              <strong>${b.topik}</strong>
+              <p style="margin-top:.25rem;">${b.catatan || ''}</p>
+              ${b.catatanDosen ? `
+                <div style="margin-top:.6rem;padding:.65rem .875rem;background:${b.status==='revisi'?'var(--danger-light)':'var(--navy-50)'};border-radius:8px;border-left:3px solid ${b.status==='revisi'?'var(--danger)':'var(--navy-600)'};">
+                  <div style="font-size:.7rem;font-weight:700;color:${b.status==='revisi'?'var(--danger)':'var(--navy-600)'};text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem;display:flex;align-items:center;gap:.4rem;">
+                    📝 Catatan Dosen${b.reviewOleh ? ' — ' + b.reviewOleh : ''}${b.reviewTgl ? ' · ' + b.reviewTgl : ''}
+                  </div>
+                  <div style="font-size:.85rem;color:var(--text);line-height:1.6;white-space:pre-line;">${b.catatanDosen}</div>
+                </div>` : (!isSistem && !isDokUpload && !isDokReview ? '<div style="margin-top:.35rem;font-size:.78rem;color:var(--text3);font-style:italic;">Menunggu catatan dari dosen...</div>' : '')}
+              <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem;">${statusBadge(b.status)}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`}`;
+}
+
+function showModalLogbook() {
+  const skripsi = getMhsSkripsi(currentUser.id);
+  openModal(`
+    <h2>Catat Sesi Bimbingan</h2>
+    <div class="form-group"><label class="form-label">Tanggal Bimbingan</label><input class="form-input" id="m-tgl" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+    <div class="form-group"><label class="form-label">Topik / Agenda</label><input class="form-input" id="m-topik" placeholder="Topik yang dibahas"></div>
+    <div class="form-group"><label class="form-label">Catatan / Hasil Bimbingan</label><textarea class="form-textarea" id="m-catatan" placeholder="Tulis catatan bimbingan..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitLogbook('${skripsi.id}')">Simpan</button>
+    </div>`);
+}
+
+function submitLogbook(skripsiId) {
+  const tgl = document.getElementById('m-tgl').value;
+  const topik = document.getElementById('m-topik').value.trim();
+  const catatan = document.getElementById('m-catatan').value.trim();
+  if (!tgl || !topik) { alert('Tanggal dan topik wajib diisi!'); return; }
+  const skripsi = appData.skripsi[skripsiId];
+  const id = genId('b');
+  appData.bimbingan[id] = {
+    id, skripsiId, tanggal: tgl, topik, catatan,
+    status: 'menunggu',
+    dosbingId: skripsi.dosbingId,
+    dosbingId2: skripsi.dosbingId2 || '',
+    mahasiswaId: skripsi.mahasiswaId,
+    dicatatOleh: currentUser.name,
+    tglDibuat: new Date().toISOString().slice(0,10),
+  };
+  saveData();
+  closeModal();
+  renderLogbook();
+}
+
+// ═══════════════════════════════════════
+// MAHASISWA: DOKUMEN
+// ═══════════════════════════════════════
+function renderDokumen() {
+  const mc = document.getElementById('main-content');
+  const skripsi = getMhsSkripsi(currentUser.id);
+  if (!skripsi) { mc.innerHTML = `<div class="page-header"><h1>Dokumen Skripsi</h1></div><div class="info-box amber">Anda belum mengajukan judul skripsi.</div>`; return; }
+  const docs = getSkripsiDokumen(skripsi.id);
+  const adaRevisi = docs.some(d => d.status === 'revisi' && d.catatanDosen);
+  mc.innerHTML = `
+    <div class="page-header"><h1>Dokumen Skripsi</h1><p>Upload dan kelola dokumen skripsi Anda</p></div>
+    ${adaRevisi ? `<div class="info-box red" style="margin-bottom:1rem;">⚠️ Ada dokumen yang memerlukan <strong>perbaikan</strong> dari dosen. Silakan perbaiki dan upload ulang dokumen tersebut.</div>` : ''}
+    <div class="action-bar">
+      <span style="font-size:.875rem;color:var(--text2);">${docs.length} dokumen</span>
+      <button class="btn btn-green" onclick="showModalDokumen()">+ Upload Dokumen</button>
+    </div>
+    <div class="card">
+      ${docs.length === 0 ? '<div class="empty-state"><div class="icon">📄</div><p>Belum ada dokumen diunggah</p></div>' :
+        docs.map(d => {
+          const tipeLabelMap = {
+            'proposal':'Proposal','bab':'Bab Skripsi','final':'Draft Final',
+            'surat_acc_sempro':'Surat Acc Sempro','surat_acc_semhas':'Surat Acc Semhas',
+            'surat_acc_ujian':'Surat Acc Ujian','hasil_plagiarisme':'Hasil Plagiarisme',
+            'surat_yudisium':'Surat Yudisium','lainnya':'Lainnya'
+          };
+          const isSurat = ['surat_acc_sempro','surat_acc_semhas','surat_acc_ujian','hasil_plagiarisme','surat_yudisium'].includes(d.tipe);
+          return `<div class="file-item" style="flex-direction:column;align-items:stretch;">
+            <div style="display:flex;align-items:center;gap:.75rem;">
+              <div class="file-icon" style="${isSurat?'background:var(--warning-light);color:var(--warning);':''}">${isSurat?'📋':d.tipe.toUpperCase().slice(0,3)}</div>
+              <div style="flex:1;">
+                <div class="file-name">${d.nama}</div>
+                <div class="file-meta">${d.tglUpload} · ${tipeLabelMap[d.tipe]||d.tipe}</div>
+                ${d.url && d.url !== '#' ? `<a href="${d.url}" target="_blank" style="font-size:.75rem;color:var(--navy-700);text-decoration:none;font-weight:600;">🔗 Buka Dokumen</a>` : ''}
+              </div>
+              ${statusBadge(d.status)}
+            </div>
+            ${d.catatanDosen ? `
+              <div style="margin-top:.65rem;padding:.6rem .875rem;background:${d.status==='revisi'?'var(--danger-light)':'var(--navy-50)'};border-radius:8px;border-left:3px solid ${d.status==='revisi'?'var(--danger)':'var(--navy-600)'};">
+                <div style="font-size:.7rem;font-weight:700;color:${d.status==='revisi'?'var(--danger)':'var(--navy-600)'};text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;">
+                  📝 Catatan Perbaikan Dosen${d.reviewOleh ? ' — ' + d.reviewOleh : ''}${d.reviewTgl ? ' · ' + d.reviewTgl : ''}
+                </div>
+                <div style="font-size:.83rem;color:var(--text);line-height:1.6;white-space:pre-line;">${d.catatanDosen}</div>
+              </div>` : ''}
+          </div>`;
+        }).join('')}
+    </div>`;
+}
+
+function showModalDokumen() {
+  const skripsi = getMhsSkripsi(currentUser.id);
+  openModal(`
+    <h2>Upload Dokumen</h2>
+    <div class="info-box blue" style="margin-bottom:1rem;">Sistem ini mencatat <strong>link dokumen</strong> (Google Drive, Dropbox, OneDrive, dll). Untuk surat-surat resmi dari kampus (Acc Sempro, Semhas, dll), scan/foto surat lalu upload ke Google Drive dan tempel linknya di sini.</div>
+    <div class="form-group"><label class="form-label">Nama Dokumen</label><input class="form-input" id="m-docname" placeholder="Contoh: Bab 1-2 Revisi.pdf"></div>
+    <div class="form-group"><label class="form-label">Jenis Dokumen</label>
+      <select class="form-select" id="m-doctype">
+        <option value="proposal">Proposal</option>
+        <option value="bab">Bab Skripsi</option>
+        <option value="final">Draft Final</option>
+        <option value="surat_acc_sempro">Surat Acc Seminar Proposal</option>
+        <option value="surat_acc_semhas">Surat Acc Seminar Hasil</option>
+        <option value="surat_acc_ujian">Surat Acc Ujian Skripsi</option>
+        <option value="hasil_plagiarisme">Hasil Cek Plagiarisme</option>
+        <option value="surat_yudisium">Surat Yudisium</option>
+        <option value="lainnya">Lainnya</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Link Dokumen (Google Drive / URL)</label><input class="form-input" id="m-docurl" placeholder="https://drive.google.com/..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitDokumen('${skripsi.id}')">Simpan</button>
+    </div>`);
+}
+
+function submitDokumen(skripsiId) {
+  const nama = document.getElementById('m-docname').value.trim();
+  const tipe = document.getElementById('m-doctype').value;
+  const url  = document.getElementById('m-docurl').value.trim();
+  if (!nama) { alert('Nama dokumen wajib diisi!'); return; }
+  const id = genId('d');
+  const skripsi = appData.skripsi[skripsiId];
+  const tglUpload = new Date().toISOString().slice(0,10);
+  appData.dokumen[id] = { id, skripsiId, mahasiswaId: skripsi.mahasiswaId, nama, tipe, tglUpload, url, status:'review' };
+  // Catat ke logbook
+  const tipeLabelMap = {
+    'proposal':'Proposal','bab':'Bab Skripsi','final':'Draft Final',
+    'surat_acc_sempro':'Surat Acc Sempro','surat_acc_semhas':'Surat Acc Semhas',
+    'surat_acc_ujian':'Surat Acc Ujian','hasil_plagiarisme':'Hasil Plagiarisme',
+    'surat_yudisium':'Surat Yudisium','lainnya':'Lainnya'
+  };
+  const logId = genId('b');
+  appData.bimbingan[logId] = {
+    id: logId,
+    skripsiId,
+    tanggal: tglUpload,
+    topik: `📎 Upload Dokumen: ${tipeLabelMap[tipe] || tipe}`,
+    catatan: `Mahasiswa mengupload dokumen "${nama}" (${tipeLabelMap[tipe] || tipe}).${url ? ' Link: ' + url : ''}`,
+    status: 'menunggu',
+    dosbingId: skripsi.dosbingId,
+    dosbingId2: skripsi.dosbingId2 || '',
+    mahasiswaId: skripsi.mahasiswaId,
+    dicatatOleh: currentUser.name,
+    tglDibuat: tglUpload,
+    sumberDokumen: id,
+    tipeEntri: 'dokumen',
+  };
+  saveData(); closeModal(); renderDokumen();
+}
+
+// ═══════════════════════════════════════
+// MAHASISWA: JADWAL SIDANG
+// ═══════════════════════════════════════
+function renderJadwalSidang() {
+  const mc = document.getElementById('main-content');
+  const role = currentUser.role;
+  let jadwals = Object.values(appData.sidang);
+  if (role === 'mahasiswa') jadwals = jadwals.filter(j => j.mahasiswaId === currentUser.id);
+  else if (role === 'dosen') jadwals = jadwals.filter(j => j.dosPenguji1 === currentUser.id || j.dosPenguji2 === currentUser.id);
+
+  mc.innerHTML = `
+    <div class="page-header"><h1>Jadwal Sidang</h1><p>Informasi jadwal sidang skripsi</p></div>
+    ${role === 'admin' ? `<div class="action-bar"><span></span><button class="btn btn-green" onclick="showModalJadwal()">+ Jadwalkan Sidang</button></div>` : ''}
+    ${jadwals.length === 0 ? '<div class="empty-state"><div class="icon">📅</div><p>Belum ada jadwal sidang</p></div>' :
+      jadwals.map(j => {
+        const skripsi = appData.skripsi[j.skripsiId];
+        const mhs = appData.users[j.mahasiswaId];
+        const pen1 = appData.users[j.dosPenguji1];
+        const pen2 = appData.users[j.dosPenguji2];
+        const pen3 = appData.users[j.dosPenguji3];
+        return `<div class="card" style="margin-bottom:1rem;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
+            <div>
+              <div style="font-weight:700;font-size:.95rem;">${mhs ? mhs.name : '-'}</div>
+              <div style="color:var(--text2);font-size:.83rem;">${skripsi ? skripsi.judul : '-'}</div>
+            </div>
+            ${statusBadge(j.status)}
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;">
+            <div><div style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Tanggal</div><div style="font-weight:600;margin-top:.2rem;">${j.tanggal}</div></div>
+            <div><div style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Waktu</div><div style="font-weight:600;margin-top:.2rem;">${j.jam} WIB</div></div>
+            <div><div style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Ruang</div><div style="font-weight:600;margin-top:.2rem;">${j.ruang}</div></div>
+            <div><div style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Penguji 1</div><div style="font-weight:600;margin-top:.2rem;">${pen1 ? pen1.name.split(',')[0] : '-'}</div></div>
+            <div><div style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Penguji 2</div><div style="font-weight:600;margin-top:.2rem;">${pen2 ? pen2.name.split(',')[0] : '-'}</div></div>
+            <div><div style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;">Penguji 3</div><div style="font-weight:600;margin-top:.2rem;">${pen3 ? pen3.name.split(',')[0] : '-'}</div></div>
+          </div>
+          ${role==='admin'?`<div style="margin-top:1rem;display:flex;gap:.5rem;"><button class="btn btn-ghost btn-sm" onclick="editJadwal('${j.id}')">Edit</button><button class="btn btn-red btn-sm" onclick="hapusJadwal('${j.id}')">Hapus</button></div>`:''}
+        </div>`;
+      }).join('')}`;
+}
+
+function showModalJadwal(editId) {
+  const j = editId ? appData.sidang[editId] : null;
+  const dosens = Object.values(appData.users).filter(u=>u.role==='dosen');
+  const mhsList = Object.values(appData.users).filter(u=>u.role==='mahasiswa');
+  openModal(`
+    <h2>${editId ? 'Edit' : 'Jadwalkan'} Sidang</h2>
+    <div class="form-group"><label class="form-label">Mahasiswa</label>
+      <select class="form-select" id="m-mhs" onchange="updateSkripsiFromMhs(this.value)">
+        <option value="">-- Pilih Mahasiswa --</option>
+        ${mhsList.map(m=>`<option value="${m.id}" ${j&&j.mahasiswaId===m.id?'selected':''}>${m.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Skripsi</label><input class="form-input" id="m-judul-sidang" readonly placeholder="Pilih mahasiswa terlebih dahulu" value="${j?appData.skripsi[j.skripsiId]?.judul||'':''}" style="background:var(--surface2)"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tanggal</label><input class="form-input" id="m-tgl-sidang" type="date" value="${j?j.tanggal:''}"></div>
+      <div class="form-group"><label class="form-label">Jam</label><input class="form-input" id="m-jam" type="time" value="${j?j.jam:'09:00'}"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Ruang</label><input class="form-input" id="m-ruang" placeholder="Ruang Sidang A" value="${j?j.ruang:''}"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Dosen Penguji 1</label>
+        <select class="form-select" id="m-pen1">
+          <option value="">-- Pilih --</option>
+          ${dosens.map(d=>`<option value="${d.id}" ${j&&j.dosPenguji1===d.id?'selected':''}>${d.name.split(',')[0]}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Dosen Penguji 2</label>
+        <select class="form-select" id="m-pen2">
+          <option value="">-- Pilih --</option>
+          ${dosens.map(d=>`<option value="${d.id}" ${j&&j.dosPenguji2===d.id?'selected':''}>${d.name.split(',')[0]}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Dosen Penguji 3</label>
+      <select class="form-select" id="m-pen3">
+        <option value="">-- Pilih --</option>
+        ${dosens.map(d=>`<option value="${d.id}" ${j&&j.dosPenguji3===d.id?'selected':''}>${d.name.split(',')[0]}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitJadwal('${editId||''}')">Simpan</button>
+    </div>`);
+  if (j) { document.getElementById('m-mhs').value = j.mahasiswaId; }
+}
+
+function updateSkripsiFromMhs(mhsId) {
+  const sk = getMhsSkripsiById(mhsId);
+  document.getElementById('m-judul-sidang').value = sk ? sk.judul : '';
+}
+function getMhsSkripsiById(mhsId) {
+  return Object.values(appData.skripsi).find(s => s.mahasiswaId === mhsId);
+}
+
+function submitJadwal(editId) {
+  const mhsId = document.getElementById('m-mhs').value;
+  const tgl = document.getElementById('m-tgl-sidang').value;
+  const jam = document.getElementById('m-jam').value;
+  const ruang = document.getElementById('m-ruang').value.trim();
+  const pen1 = document.getElementById('m-pen1').value;
+  const pen2 = document.getElementById('m-pen2').value;
+  const pen3 = document.getElementById('m-pen3').value;
+  if (!mhsId || !tgl || !ruang) { alert('Mahasiswa, tanggal, dan ruang wajib diisi!'); return; }
+  const sk = getMhsSkripsiById(mhsId);
+  if (!sk) { alert('Mahasiswa belum mengajukan skripsi!'); return; }
+  const isEdit = !!editId;
+  const id = editId || genId('sd');
+  appData.sidang[id] = { id, skripsiId: sk.id, mahasiswaId: mhsId, tanggal: tgl, jam, ruang, dosPenguji1: pen1, dosPenguji2: pen2, dosPenguji3: pen3, status:'terjadwal' };
+  const tglSekarang = new Date().toISOString().slice(0,10);
+  const pen1Name = pen1 ? (appData.users[pen1]?.name || pen1) : '-';
+  const pen2Name = pen2 ? (appData.users[pen2]?.name || pen2) : '-';
+  const pen3Name = pen3 ? (appData.users[pen3]?.name || pen3) : '';
+  if (!isEdit) {
+    sk.status = 'ujian_skripsi';
+    if (!sk.riwayatProgres) sk.riwayatProgres = [];
+    sk.riwayatProgres.push({
+      status: 'ujian_skripsi',
+      tanggal: tglSekarang,
+      catatan: `Dijadwalkan: ${tgl} ${jam} di ${ruang}`,
+      oleh: currentUser.name,
+    });
+  }
+  // Catat ke logbook
+  const logId = genId('b');
+  appData.bimbingan[logId] = {
+    id: logId,
+    skripsiId: sk.id,
+    tanggal: tglSekarang,
+    topik: isEdit ? '📅 Perubahan Jadwal Sidang' : '📅 Penjadwalan Sidang Skripsi',
+    catatan: `${isEdit ? 'Jadwal sidang diperbarui' : 'Sidang skripsi dijadwalkan'}: ${tgl} pukul ${jam} WIB di ${ruang}. Penguji: ${pen1Name}, ${pen2Name}${pen3Name ? ', ' + pen3Name : ''}.`,
+    catatanDosen: '',
+    status: 'selesai',
+    dosbingId: sk.dosbingId,
+    dosbingId2: sk.dosbingId2 || '',
+    mahasiswaId: mhsId,
+    dicatatOleh: currentUser.name,
+    tglDibuat: tglSekarang,
+    tipeEntri: 'sistem',
+  };
+  saveData(); closeModal(); renderJadwalSidang();
+}
+function editJadwal(id) { showModalJadwal(id); }
+function hapusJadwal(id) { if(confirm('Hapus jadwal ini?')) { delete appData.sidang[id]; saveData(); renderJadwalSidang(); } }
+
+// ═══════════════════════════════════════
+// MAHASISWA: NILAI SAYA
+// ═══════════════════════════════════════
+function renderNilaiSaya() {
+  const mc = document.getElementById('main-content');
+  const skripsi = getMhsSkripsi(currentUser.id);
+  if (!skripsi) { mc.innerHTML = `<div class="page-header"><h1>Nilai Sidang</h1></div><div class="info-box amber">Anda belum memiliki skripsi.</div>`; return; }
+  const nilai = Object.values(appData.nilai).find(n => n.mahasiswaId === currentUser.id);
+  mc.innerHTML = `
+    <div class="page-header"><h1>Nilai Sidang</h1><p>Hasil penilaian sidang skripsi Anda</p></div>
+    ${!nilai ? '<div class="info-box amber">Belum ada nilai sidang. Nilai akan tersedia setelah sidang selesai.</div>' : `
+      <div class="card" style="max-width:480px;">
+        <div class="card-title">Rincian Nilai</div>
+        ${nilai.totalNilai !== null ? `
+          <div style="text-align:center;padding:1.5rem 0;border-bottom:1px solid var(--border);margin-bottom:1.25rem;">
+            <div style="font-family:'DM Serif Display',serif;font-size:3.5rem;font-weight:600;color:var(--navy-700);">${nilai.totalNilai}</div>
+            <div style="font-size:1.1rem;font-weight:700;color:var(--text2);">${nilai.grade || '-'}</div>
+          </div>` : '<div class="info-box amber">Nilai belum dihitung. Menunggu input dari dosen.</div>'}
+        <div>
+          <div style="font-weight:700;font-size:.8rem;margin-bottom:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;">Nilai Penguji 1</div>
+          ${['pembimbing','presentasi','penguasaan'].map(k => `<div class="rating-row"><span class="rating-label">${k.charAt(0).toUpperCase()+k.slice(1)}</span><span class="rating-score">${nilai.penguji1[k] ?? '-'}</span></div>`).join('')}
+          <div style="font-weight:700;font-size:.8rem;margin-top:1rem;margin-bottom:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;">Nilai Penguji 2</div>
+          ${['pembimbing','presentasi','penguasaan'].map(k => `<div class="rating-row"><span class="rating-label">${k.charAt(0).toUpperCase()+k.slice(1)}</span><span class="rating-score">${nilai.penguji2[k] ?? '-'}</span></div>`).join('')}
+          <div style="font-weight:700;font-size:.8rem;margin-top:1rem;margin-bottom:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;">Nilai Penguji 3</div>
+          ${nilai.penguji3 ? ['pembimbing','presentasi','penguasaan'].map(k => `<div class="rating-row"><span class="rating-label">${k.charAt(0).toUpperCase()+k.slice(1)}</span><span class="rating-score">${nilai.penguji3[k] ?? '-'}</span></div>`).join('') : '<div class="info-box amber" style="font-size:.8rem;">Belum ada nilai dari Penguji 3.</div>'}
+        </div>
+        ${nilai.catatan ? `<div class="info-box blue" style="margin-top:1rem;"><strong>Catatan:</strong> ${nilai.catatan}</div>` : ''}
+      </div>`}`;
+}
+
+// ═══════════════════════════════════════
+// DOSEN: DAFTAR BIMBINGAN
+// ═══════════════════════════════════════
+function renderDaftarBimbingan() {
+  const mc = document.getElementById('main-content');
+  const bimbingans = getDosenBimbingan(currentUser.id);
+  mc.innerHTML = `
+    <div class="page-header"><h1>Daftar Mahasiswa Bimbingan</h1></div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Mahasiswa</th><th>NIM</th><th>Judul Skripsi</th><th>Tahapan</th><th>Aksi</th></tr></thead>
+          <tbody>
+            ${bimbingans.map(sk => {
+              const mhs = appData.users[sk.mahasiswaId];
+              const curIdx = tahapanIndex(sk.status);
+              const nextTahap = TAHAPAN[curIdx + 1];
+              return `<tr>
+                <td><strong>${mhs ? mhs.name : '-'}</strong></td>
+                <td>${mhs ? mhs.nim : '-'}</td>
+                <td style="max-width:180px;">${sk.judul}</td>
+                <td>${statusBadge(sk.status)}</td>
+                <td>
+                  <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+                    ${sk.status==='pengajuan'
+                      ? `<button class="btn btn-green btn-sm" onclick="setujuiJudul('${sk.id}')">Setujui</button>
+                         <button class="btn btn-red btn-sm" onclick="tolakJudul('${sk.id}')">Tolak</button>`
+                      : nextTahap
+                        ? `<button class="btn btn-amber btn-sm" onclick="showModalUpdateProgres('${sk.id}','${nextTahap.key}','${nextTahap.label}')">➜ ${nextTahap.short}</button>`
+                        : `<span class="badge badge-green" style="font-size:.7rem;">✓ Selesai</span>`}
+                    <button class="btn btn-ghost btn-sm" onclick="showDetailBimbingan('${sk.id}')">Detail</button>
+                  </div>
+                </td>
+              </tr>`;
+            }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text3);">Tidak ada data</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function setujuiJudul(skripsiId) {
+  openModal(`
+    <h2>Setujui Judul</h2>
+    <div class="form-group"><label class="form-label">Catatan (opsional)</label><textarea class="form-textarea" id="m-catatan-acc" placeholder="Catatan untuk mahasiswa..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="doSetujuiJudul('${skripsiId}')">Setujui</button>
+    </div>`);
+}
+function doSetujuiJudul(id) {
+  const catatan = document.getElementById('m-catatan-acc').value.trim();
+  appData.skripsi[id].status = 'acc_judul';
+  appData.skripsi[id].catatan = catatan;
+  if (!appData.skripsi[id].riwayatProgres) appData.skripsi[id].riwayatProgres = [];
+  appData.skripsi[id].riwayatProgres.push({
+    status: 'acc_judul',
+    tanggal: new Date().toISOString().slice(0,10),
+    catatan,
+    oleh: currentUser.name,
+  });
+  // Catat ke logbook bimbingan
+  const sk = appData.skripsi[id];
+  const logId = genId('b');
+  appData.bimbingan[logId] = {
+    id: logId,
+    skripsiId: id,
+    tanggal: new Date().toISOString().slice(0,10),
+    topik: '✅ Persetujuan Judul Skripsi',
+    catatan: `Judul "${sk.judul}" telah disetujui oleh dosen pembimbing.`,
+    catatanDosen: catatan || 'Judul disetujui.',
+    status: 'selesai',
+    dosbingId: currentUser.id,
+    dosbingId2: sk.dosbingId2 || '',
+    mahasiswaId: sk.mahasiswaId,
+    reviewOleh: currentUser.name,
+    reviewTgl: new Date().toISOString().slice(0,10),
+    tipeEntri: 'sistem',
+  };
+  saveData(); closeModal(); renderDaftarBimbingan();
+}
+function tolakJudul(skripsiId) {
+  openModal(`
+    <h2>Tolak Judul</h2>
+    <div class="form-group"><label class="form-label">Alasan Penolakan</label><textarea class="form-textarea" id="m-catatan-tolak" placeholder="Berikan alasan penolakan..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-red" onclick="doTolakJudul('${skripsiId}')">Tolak</button>
+    </div>`);
+}
+function doTolakJudul(id) {
+  const catatan = document.getElementById('m-catatan-tolak').value.trim();
+  appData.skripsi[id].status = 'ditolak';
+  appData.skripsi[id].catatan = catatan;
+  if (!appData.skripsi[id].riwayatProgres) appData.skripsi[id].riwayatProgres = [];
+  appData.skripsi[id].riwayatProgres.push({
+    status: 'ditolak',
+    tanggal: new Date().toISOString().slice(0,10),
+    catatan,
+    oleh: currentUser.name,
+  });
+  // Catat ke logbook bimbingan
+  const sk = appData.skripsi[id];
+  const logId = genId('b');
+  appData.bimbingan[logId] = {
+    id: logId,
+    skripsiId: id,
+    tanggal: new Date().toISOString().slice(0,10),
+    topik: '❌ Penolakan Judul Skripsi',
+    catatan: `Judul "${sk.judul}" ditolak. Mahasiswa diminta mengajukan ulang.`,
+    catatanDosen: catatan || 'Judul ditolak.',
+    status: 'revisi',
+    dosbingId: currentUser.id,
+    dosbingId2: sk.dosbingId2 || '',
+    mahasiswaId: sk.mahasiswaId,
+    reviewOleh: currentUser.name,
+    reviewTgl: new Date().toISOString().slice(0,10),
+    tipeEntri: 'sistem',
+  };
+  saveData(); closeModal(); renderDaftarBimbingan();
+}
+function showDetailBimbingan(skripsiId) {
+  const sk = appData.skripsi[skripsiId];
+  const mhs = appData.users[sk.mahasiswaId];
+  const lb = getSkripsiLogbook(skripsiId);
+  openModal(`
+    <h2>${mhs ? mhs.name : '-'}</h2>
+    <div style="color:var(--text2);font-size:.83rem;margin-bottom:1rem;">${sk.judul}</div>
+    <div class="tabs"><div class="tab active" onclick="switchTab(this,'tab-lb')">Logbook</div><div class="tab" onclick="switchTab(this,'tab-dok')">Dokumen</div></div>
+    <div id="tab-lb">
+      <div class="timeline">
+        ${lb.map(b => {
+          const isDokReview = !!b.sumberDokumen;
+          return `<div class="tl-item"><div class="tl-dot"></div>
+            <div class="tl-date">${b.tanggal}${isDokReview ? ' <span style="font-size:.68rem;background:var(--info-light);color:var(--info);padding:.1rem .35rem;border-radius:4px;font-weight:600;">📄 Review Dok.</span>' : ''}</div>
+            <div class="tl-content"><strong>${b.topik}</strong><p>${b.catatan}</p>
+              ${b.catatanDosen ? `
+                <div style="margin-top:.5rem;padding:.5rem .7rem;background:${b.status==='revisi'?'var(--danger-light)':'var(--navy-50)'};border-radius:6px;border-left:3px solid ${b.status==='revisi'?'var(--danger)':'var(--navy-600)'};">
+                  <div style="font-size:.68rem;font-weight:700;color:${b.status==='revisi'?'var(--danger)':'var(--navy-600)'};text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">📝 Catatan Dosen${b.reviewTgl?' · '+b.reviewTgl:''}</div>
+                  <div style="font-size:.8rem;line-height:1.5;">${b.catatanDosen}</div>
+                </div>` : ''}
+              ${statusBadge(b.status)}
+              <div style="display:flex;gap:.4rem;margin-top:.5rem;">
+                <button class="btn btn-green btn-sm" onclick="updateLogStatus('${b.id}','selesai')">Selesai</button>
+                <button class="btn btn-amber btn-sm" onclick="showModalReviewLogInline('${b.id}','revisi')">✎ Catatan</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('') || '<div class="empty-state"><p>Belum ada logbook</p></div>'}
+      </div>
+    </div>
+    <div id="tab-dok" style="display:none;">
+      ${getSkripsiDokumen(skripsiId).map(d => `<div class="file-item" style="flex-direction:column;align-items:stretch;">
+        <div style="display:flex;align-items:center;gap:.6rem;">
+          <div class="file-icon">${d.tipe.toUpperCase().slice(0,3)}</div>
+          <div style="flex:1;"><div class="file-name">${d.nama}</div><div class="file-meta">${d.tglUpload}</div></div>
+          ${statusBadge(d.status)}
+          <div style="display:flex;gap:.3rem;">
+            <button class="btn btn-green btn-sm" onclick="showModalReviewDok('${d.id}','disetujui')">✓</button>
+            <button class="btn btn-amber btn-sm" onclick="showModalReviewDok('${d.id}','revisi')">✎</button>
+          </div>
+        </div>
+        ${d.catatanDosen ? `<div style="margin-top:.5rem;padding:.45rem .65rem;background:${d.status==='revisi'?'var(--danger-light)':'var(--navy-50)'};border-radius:6px;font-size:.78rem;line-height:1.5;color:var(--text);">📝 ${d.catatanDosen}</div>` : ''}
+      </div>`).join('') || '<div class="empty-state"><p>Belum ada dokumen</p></div>'}
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Tutup</button></div>`);
+}
+
+function showModalReviewLogInline(id, statusBaru) {
+  // Helper: buka review modal dari dalam detail bimbingan
+  showModalReviewLog(id, statusBaru);
+}
+
+function updateLogStatus(id, status) {
+  appData.bimbingan[id].status = status;
+  saveData();
+  const skripsiId = appData.bimbingan[id].skripsiId;
+  setupSidebar();
+  showDetailBimbingan(skripsiId);
+}
+function setDocStatus(id, status) {
+  appData.dokumen[id].status = status;
+  saveData();
+  const skripsiId = appData.dokumen[id].skripsiId;
+  showDetailBimbingan(skripsiId);
+}
+
+function switchTab(el, targetId) {
+  el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['tab-lb','tab-dok'].forEach(id => { const el2 = document.getElementById(id); if(el2) el2.style.display = id===targetId?'block':'none'; });
+}
+
+// ═══════════════════════════════════════
+// DOSEN: REVIEW LOGBOOK
+// ═══════════════════════════════════════
+function renderReviewLogbook(filterQ) {
+  const mc = document.getElementById('main-content');
+  const q = (filterQ || '').toLowerCase().trim();
+  const semua = Object.values(appData.bimbingan)
+    .filter(b => b.dosbingId === currentUser.id || b.dosbingId2 === currentUser.id)
+    .sort((a,b) => b.tanggal.localeCompare(a.tanggal));
+  const menunggu = semua.filter(b => b.status === 'menunggu');
+  const perMhs = {};
+  semua.forEach(b => { if (!perMhs[b.mahasiswaId]) perMhs[b.mahasiswaId] = []; perMhs[b.mahasiswaId].push(b); });
+  const filtered = Object.entries(perMhs).filter(([mhsId]) => {
+    if (!q) return true;
+    const mhs = appData.users[mhsId];
+    const sk = Object.values(appData.skripsi).find(s => s.mahasiswaId === mhsId);
+    return (mhs && (mhs.name.toLowerCase().includes(q) || (mhs.nim||'').toLowerCase().includes(q)))
+        || (sk && sk.judul.toLowerCase().includes(q));
+  });
+  mc.innerHTML = `
+    <div class="page-header"><h1>Review Logbook</h1><p>Berikan catatan perbaikan atau konfirmasi bimbingan mahasiswa</p></div>
+    ${menunggu.length > 0 ? `<div class="info-box amber" style="margin-bottom:1rem;">⏳ <strong>${menunggu.length} entri</strong> menunggu review Anda</div>` : '<div class="info-box green" style="margin-bottom:1rem;">✅ Semua logbook sudah diReview</div>'}
+    <div style="margin-bottom:1.25rem;">
+      <input class="search-input" id="search-lb" type="text" placeholder="🔍 Cari nama / NIM / judul mahasiswa..." value="${q.replace(/"/g,'&quot;')}" oninput="renderReviewLogbook(this.value)" style="width:100%;max-width:460px;">
+    </div>
+    ${filtered.length === 0
+      ? `<div class="empty-state"><div class="icon">📝</div><p>${q ? 'Tidak ada hasil untuk "'+q+'"' : 'Belum ada logbook dari mahasiswa bimbingan'}</p></div>`
+      : filtered.map(([mhsId, logs]) => {
+          const mhs = appData.users[mhsId];
+          const sk = Object.values(appData.skripsi).find(s => s.mahasiswaId === mhsId);
+          const jmlMenunggu = logs.filter(b => b.status === 'menunggu').length;
+          const cardId = 'lb-card-'+mhsId;
+          const autoOpen = jmlMenunggu > 0 || !!q;
+          return `
+            <div class="card" style="margin-bottom:1rem;padding:0;overflow:hidden;">
+              <div onclick="toggleCard('${cardId}')" style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;cursor:pointer;user-select:none;">
+                <div style="display:flex;align-items:center;gap:.75rem;flex:1;min-width:0;">
+                  <div style="width:38px;height:38px;border-radius:50%;background:var(--navy-100);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:var(--navy-700);flex-shrink:0;">${mhs?mhs.name.charAt(0).toUpperCase():'?'}</div>
+                  <div style="min-width:0;">
+                    <div style="font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+                      ${mhs ? mhs.name : '-'} <span style="font-size:.72rem;color:var(--text3);font-weight:400;">${mhs?mhs.nim:''}</span>
+                      ${jmlMenunggu > 0 ? `<span style="background:var(--warning);color:#fff;font-size:.68rem;font-weight:700;padding:.1rem .45rem;border-radius:999px;">${jmlMenunggu} menunggu</span>` : ''}
+                    </div>
+                    ${sk ? `<div style="font-size:.78rem;color:var(--text2);margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:400px;">${sk.judul}</div>` : ''}
+                    <div style="font-size:.72rem;color:var(--text3);">${logs.length} entri logbook</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:.5rem;align-items:center;flex-shrink:0;margin-left:.75rem;">
+                  ${sk ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showKartuBimbingan('${sk.id}')">🖨️ Cetak</button>` : ''}
+                  <span id="${cardId}-chevron" style="color:var(--text3);">${autoOpen?'▲':'▼'}</span>
+                </div>
+              </div>
+              <div id="${cardId}" style="display:${autoOpen?'block':'none'};padding:0 1.25rem 1.25rem;border-top:1px solid var(--border);">
+                <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:1rem;">
+                  ${logs.map(b => `
+                    <div style="border:1px solid var(--border);border-left:4px solid ${b.status==='revisi'?'var(--danger)':b.status==='selesai'?'var(--navy-600)':'var(--warning)'};border-radius:var(--radius);padding:.75rem 1rem;">
+                      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem;flex-wrap:wrap;gap:.4rem;">
+                        <div style="font-weight:600;font-size:.85rem;">${b.topik}</div>
+                        <div style="display:flex;align-items:center;gap:.4rem;">${statusBadge(b.status)}<span style="font-size:.75rem;color:var(--text3);">${b.tanggal}</span></div>
+                      </div>
+                      <div style="background:var(--surface2);border-radius:6px;padding:.5rem .75rem;margin-bottom:.5rem;">
+                        <div style="font-size:.68rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">Catatan Mahasiswa</div>
+                        <p style="font-size:.82rem;color:var(--text2);line-height:1.5;">${b.catatan || '-'}</p>
+                      </div>
+                      ${b.catatanDosen ? `
+                        <div style="background:${b.status==='revisi'?'var(--danger-light)':'var(--navy-50)'};border-radius:6px;padding:.5rem .75rem;margin-bottom:.5rem;">
+                          <div style="font-size:.68rem;font-weight:600;color:${b.status==='revisi'?'var(--danger)':'var(--navy-600)'};text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">📝 Catatan Dosen${b.reviewTgl?' · '+b.reviewTgl:''}</div>
+                          <p style="font-size:.82rem;color:var(--text);line-height:1.5;">${b.catatanDosen}</p>
+                        </div>` : ''}
+                      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+                        ${b.status === 'menunggu' ? `
+                          <button class="btn btn-green btn-sm" onclick="showModalReviewLog('${b.id}','selesai')">✓ Selesai / Acc</button>
+                          <button class="btn btn-amber btn-sm" onclick="showModalReviewLog('${b.id}','revisi')">✎ Beri Catatan</button>
+                        ` : `<button class="btn btn-ghost btn-sm" onclick="showModalReviewLog('${b.id}','${b.status}')">✎ Edit Catatan</button>`}
+                      </div>
+                    </div>`).join('')}
+                </div>
+              </div>
+            </div>`;
+        }).join('')}`;
+  if (q) { const inp = document.getElementById('search-lb'); if (inp) { inp.focus(); const l=inp.value.length; inp.setSelectionRange(l,l); } }
+}
+function showModalReviewLog(id, statusBaru) {
+  const b = appData.bimbingan[id];
+  const mhs = appData.users[b.mahasiswaId];
+  const isRevisi = statusBaru === 'revisi';
+  openModal(`
+    <h2>${isRevisi ? '✎ Catatan Perbaikan' : '✓ Konfirmasi Selesai'}</h2>
+    <div class="info-box ${isRevisi?'amber':'green'}" style="margin-bottom:1rem;">
+      <strong>${mhs ? mhs.name : '-'}</strong> · ${b.tanggal}<br>
+      <span style="font-size:.85rem;">${b.topik}</span>
+    </div>
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:.65rem .875rem;margin-bottom:1rem;">
+      <div style="font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:.3rem;">Catatan Mahasiswa</div>
+      <p style="font-size:.83rem;color:var(--text2);">${b.catatan || '-'}</p>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Catatan Perbaikan / Arahan Dosen ${isRevisi?'<span style="color:var(--danger);">*wajib</span>':''}</label>
+      <textarea class="form-textarea" id="m-catatan-dosen" placeholder="${isRevisi?'Tulis catatan perbaikan yang harus dilakukan mahasiswa...':'Tulis arahan atau konfirmasi (opsional)...'}" style="min-height:110px;">${b.catatanDosen||''}</textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn ${isRevisi?'btn-amber':'btn-green'}" onclick="doReviewLog('${id}','${statusBaru}')">
+        ${isRevisi ? '✎ Simpan Catatan Perbaikan' : '✓ Konfirmasi Selesai'}
+      </button>
+    </div>`);
+}
+
+function doReviewLog(id, status) {
+  const catatan = document.getElementById('m-catatan-dosen').value.trim();
+  if (status === 'revisi' && !catatan) { alert('Catatan perbaikan wajib diisi saat menandai revisi!'); return; }
+  appData.bimbingan[id].status = status;
+  appData.bimbingan[id].catatanDosen = catatan;
+  appData.bimbingan[id].reviewOleh = currentUser.name;
+  appData.bimbingan[id].reviewTgl = new Date().toISOString().slice(0,10);
+  saveData();
+  closeModal();
+  renderReviewLogbook();
+  setupSidebar(); // refresh notif dots
+}
+
+function reviewLog(id, status) {
+  // Legacy — tetap ada untuk kompatibilitas
+  appData.bimbingan[id].status = status;
+  saveData(); renderReviewLogbook();
+}
+
+// ═══════════════════════════════════════
+// DOSEN: REVIEW DOKUMEN
+// ═══════════════════════════════════════
+function renderReviewDokumen(filterQ) {
+  const mc = document.getElementById('main-content');
+  const q = (filterQ || '').toLowerCase().trim();
+  const dosBimbingIds = getDosenBimbingan(currentUser.id).map(s => s.id);
+  const allDocs = Object.values(appData.dokumen).filter(d => dosBimbingIds.includes(d.skripsiId));
+  const menunggu = allDocs.filter(d => d.status === 'review');
+  const perMhs = {};
+  allDocs.forEach(d => { if (!perMhs[d.mahasiswaId]) perMhs[d.mahasiswaId] = []; perMhs[d.mahasiswaId].push(d); });
+  const filtered = Object.entries(perMhs).filter(([mhsId]) => {
+    if (!q) return true;
+    const mhs = appData.users[mhsId];
+    const sk = Object.values(appData.skripsi).find(s => s.mahasiswaId === mhsId);
+    return (mhs && (mhs.name.toLowerCase().includes(q) || (mhs.nim||'').toLowerCase().includes(q)))
+        || (sk && sk.judul.toLowerCase().includes(q));
+  });
+  mc.innerHTML = `
+    <div class="page-header"><h1>Review Dokumen</h1><p>Periksa dokumen mahasiswa dan berikan catatan perbaikan</p></div>
+    ${menunggu.length > 0
+      ? `<div class="info-box amber" style="margin-bottom:1rem;">⏳ <strong>${menunggu.length} dokumen</strong> menunggu review Anda</div>`
+      : '<div class="info-box green" style="margin-bottom:1rem;">✅ Semua dokumen sudah diReview</div>'}
+    <div style="margin-bottom:1.25rem;">
+      <input class="search-input" id="search-dok" type="text" placeholder="🔍 Cari nama / NIM / judul mahasiswa..." value="${q.replace(/"/g,'&quot;')}" oninput="renderReviewDokumen(this.value)" style="width:100%;max-width:460px;">
+    </div>
+    ${filtered.length === 0
+      ? `<div class="empty-state"><div class="icon">📄</div><p>${q ? 'Tidak ada hasil untuk "'+q+'"' : 'Belum ada dokumen dari mahasiswa bimbingan'}</p></div>`
+      : filtered.map(([mhsId, docs]) => {
+          const mhs = appData.users[mhsId];
+          const sk = Object.values(appData.skripsi).find(s => s.mahasiswaId === mhsId);
+          const jmlMenunggu = docs.filter(d => d.status === 'review').length;
+          const cardId = 'dok-card-'+mhsId;
+          const autoOpen = jmlMenunggu > 0 || !!q;
+          return `
+            <div class="card" style="margin-bottom:1rem;padding:0;overflow:hidden;">
+              <div onclick="toggleCard('${cardId}')" style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;cursor:pointer;user-select:none;">
+                <div style="display:flex;align-items:center;gap:.75rem;flex:1;min-width:0;">
+                  <div style="width:38px;height:38px;border-radius:50%;background:var(--navy-100);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:var(--navy-700);flex-shrink:0;">${mhs?mhs.name.charAt(0).toUpperCase():'?'}</div>
+                  <div style="min-width:0;">
+                    <div style="font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+                      ${mhs ? mhs.name : '-'} <span style="font-size:.72rem;color:var(--text3);font-weight:400;">${mhs?mhs.nim:''}</span>
+                      ${jmlMenunggu > 0 ? `<span style="background:var(--warning);color:#fff;font-size:.68rem;font-weight:700;padding:.1rem .45rem;border-radius:999px;">${jmlMenunggu} menunggu</span>` : ''}
+                    </div>
+                    ${sk ? `<div style="font-size:.78rem;color:var(--text2);margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:400px;">${sk.judul}</div>` : ''}
+                    <div style="font-size:.72rem;color:var(--text3);">${docs.length} dokumen${jmlMenunggu > 0 ? ` · <span style="color:var(--warning);font-weight:600;">${jmlMenunggu} menunggu</span>` : ''}</div>
+                  </div>
+                </div>
+                <span id="${cardId}-chevron" style="color:var(--text3);margin-left:.75rem;">${autoOpen?'▲':'▼'}</span>
+              </div>
+              <div id="${cardId}" style="display:${autoOpen?'block':'none'};padding:0 1.25rem 1.25rem;border-top:1px solid var(--border);">
+                <div style="display:flex;flex-direction:column;gap:.75rem;margin-top:1rem;">
+                  ${docs.sort((a,b)=>b.tglUpload.localeCompare(a.tglUpload)).map(d => {
+                    const borderColor = d.status==='revisi'?'var(--danger)':d.status==='disetujui'?'var(--navy-600)':'var(--warning)';
+                    return `
+                    <div style="border:1px solid var(--border);border-left:4px solid ${borderColor};border-radius:var(--radius);padding:.875rem 1rem;">
+                      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.6rem;flex-wrap:wrap;gap:.4rem;">
+                        <div style="display:flex;align-items:center;gap:.6rem;">
+                          <div class="file-icon" style="width:28px;height:28px;font-size:.65rem;">${d.tipe.toUpperCase().slice(0,3)}</div>
+                          <div>
+                            <div style="font-weight:600;font-size:.85rem;">${d.nama}</div>
+                            <div style="font-size:.72rem;color:var(--text3);">Diupload: ${d.tglUpload}</div>
+                          </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:.4rem;">${statusBadge(d.status)}</div>
+                      </div>
+                      ${d.catatanDosen ? `
+                        <div style="background:${d.status==='revisi'?'var(--danger-light)':'var(--navy-50)'};border-radius:6px;padding:.5rem .75rem;margin-bottom:.6rem;">
+                          <div style="font-size:.68rem;font-weight:600;color:${d.status==='revisi'?'var(--danger)':'var(--navy-600)'};text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">📝 Catatan Dosen${d.reviewTgl?' · '+d.reviewTgl:''}</div>
+                          <p style="font-size:.82rem;color:var(--text);line-height:1.5;">${d.catatanDosen}</p>
+                        </div>` : ''}
+                      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+                        ${d.url && d.url !== '#' ? `<a href="${d.url}" target="_blank" class="btn btn-ghost btn-sm">📎 Buka</a>` : ''}
+                        ${d.status === 'review' ? `
+                          <button class="btn btn-green btn-sm" onclick="showModalReviewDok('${d.id}','disetujui')">✓ Setujui</button>
+                          <button class="btn btn-amber btn-sm" onclick="showModalReviewDok('${d.id}','revisi')">✎ Catatan Perbaikan</button>
+                        ` : `<button class="btn btn-ghost btn-sm" onclick="showModalReviewDok('${d.id}','${d.status}')">✎ Edit Catatan</button>`}
+                      </div>
+                    </div>`;
+                  }).join('')}
+                </div>
+              </div>
+            </div>`;
+        }).join('')}`;
+  if (q) { const inp = document.getElementById('search-dok'); if (inp) { inp.focus(); const l=inp.value.length; inp.setSelectionRange(l,l); } }
+}
+function showModalReviewDok(id, statusBaru) {
+  const d = appData.dokumen[id];
+  const mhs = appData.users[d.mahasiswaId];
+  const isRevisi = statusBaru === 'revisi';
+  openModal(`
+    <h2>${isRevisi ? '✎ Catatan Perbaikan Dokumen' : '✓ Setujui Dokumen'}</h2>
+    <div class="info-box ${isRevisi?'amber':'green'}" style="margin-bottom:1rem;">
+      <strong>${mhs ? mhs.name : '-'}</strong> · ${d.tglUpload}<br>
+      <span style="font-size:.85rem;">📄 ${d.nama}</span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Catatan Perbaikan / Arahan Dosen ${isRevisi?'<span style="color:var(--danger);">*wajib</span>':''}</label>
+      <textarea class="form-textarea" id="m-catatan-dok" placeholder="${isRevisi?'Tuliskan perbaikan yang harus dilakukan pada dokumen ini...':'Catatan atau konfirmasi persetujuan (opsional)...'}" style="min-height:110px;">${d.catatanDosen||''}</textarea>
+    </div>
+    <div class="info-box blue" style="font-size:.8rem;">
+      💡 Catatan ini akan muncul di logbook mahasiswa sehingga tercatat dalam riwayat bimbingan.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn ${isRevisi?'btn-amber':'btn-green'}" onclick="doReviewDok('${id}','${statusBaru}')">
+        ${isRevisi ? '✎ Simpan Catatan Perbaikan' : '✓ Setujui Dokumen'}
+      </button>
+    </div>`);
+}
+
+function doReviewDok(id, status) {
+  const catatan = document.getElementById('m-catatan-dok').value.trim();
+  if (status === 'revisi' && !catatan) { alert('Catatan perbaikan wajib diisi saat menandai revisi!'); return; }
+  const d = appData.dokumen[id];
+  d.status = status;
+  d.catatanDosen = catatan;
+  d.reviewOleh = currentUser.name;
+  d.reviewTgl = new Date().toISOString().slice(0,10);
+
+  // Otomatis tambahkan entri logbook bimbingan jika ada catatan
+  if (catatan) {
+    const logId = genId('b');
+    appData.bimbingan[logId] = {
+      id: logId,
+      skripsiId: d.skripsiId,
+      tanggal: d.reviewTgl,
+      topik: `Review Dokumen: ${d.nama}`,
+      catatan: `Dokumen "${d.nama}" telah direview oleh dosen.`,
+      catatanDosen: catatan,
+      status: status === 'revisi' ? 'revisi' : 'selesai',
+      dosbingId: currentUser.id,
+      mahasiswaId: d.mahasiswaId,
+      reviewOleh: currentUser.name,
+      reviewTgl: d.reviewTgl,
+      sumberDokumen: id,  // referensi ke dokumen asli
+    };
+  }
+
+  saveData();
+  closeModal();
+  renderReviewDokumen();
+  setupSidebar(); // refresh notif dots
+}
+
+function reviewDoc(id, status) {
+  // Legacy — tetap ada untuk kompatibilitas
+  appData.dokumen[id].status = status;
+  saveData(); renderReviewDokumen();
+}
+
+// ═══════════════════════════════════════
+// DOSEN: INPUT NILAI
+// ═══════════════════════════════════════
+function renderInputNilai() {
+  const mc = document.getElementById('main-content');
+  const sidangs = Object.values(appData.sidang).filter(j => j.dosPenguji1 === currentUser.id || j.dosPenguji2 === currentUser.id || j.dosPenguji3 === currentUser.id);
+  mc.innerHTML = `
+    <div class="page-header"><h1>Input Nilai Sidang</h1><p>Masukkan nilai untuk mahasiswa yang telah sidang</p></div>
+    ${sidangs.length === 0 ? '<div class="empty-state"><div class="icon">⭐</div><p>Belum ada jadwal sidang yang melibatkan Anda</p></div>' :
+      sidangs.map(j => {
+        const mhs = appData.users[j.mahasiswaId];
+        const sk = appData.skripsi[j.skripsiId];
+        const nilai = Object.values(appData.nilai).find(n => n.mahasiswaId === j.mahasiswaId);
+        const pengujiKey = j.dosPenguji1 === currentUser.id ? 'penguji1' : j.dosPenguji2 === currentUser.id ? 'penguji2' : 'penguji3';
+        return `<div class="card" style="margin-bottom:1rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <div><strong>${mhs ? mhs.name : '-'}</strong><div style="color:var(--text2);font-size:.83rem;">${sk ? sk.judul : '-'}</div></div>
+            ${nilai && nilai.totalNilai ? statusBadge('selesai') : statusBadge('terjadwal')}
+          </div>
+          ${nilai && nilai.totalNilai ? `<div style="font-family:'DM Serif Display',serif;font-size:2rem;font-weight:600;color:var(--navy-700);">${nilai.totalNilai} <span style="font-size:1rem;color:var(--text2);">(${nilai.grade})</span></div>` :
+            `<button class="btn btn-green" onclick="showModalNilai('${j.mahasiswaId}','${pengujiKey}')">Input Nilai</button>`}
+        </div>`;
+      }).join('')}`;
+}
+
+function showModalNilai(mhsId, pengujiKey) {
+  openModal(`
+    <h2>Input Nilai Sidang</h2>
+    <div class="info-box blue">Nilai dalam rentang 0-100</div>
+    <div class="form-group"><label class="form-label">Nilai Pembimbingan</label><input class="form-input" id="m-n1" type="number" min="0" max="100" placeholder="0-100"></div>
+    <div class="form-group"><label class="form-label">Nilai Presentasi</label><input class="form-input" id="m-n2" type="number" min="0" max="100" placeholder="0-100"></div>
+    <div class="form-group"><label class="form-label">Nilai Penguasaan Materi</label><input class="form-input" id="m-n3" type="number" min="0" max="100" placeholder="0-100"></div>
+    <div class="form-group"><label class="form-label">Catatan (opsional)</label><textarea class="form-textarea" id="m-catatan-nilai" placeholder="Catatan untuk mahasiswa..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitNilai('${mhsId}','${pengujiKey}')">Simpan Nilai</button>
+    </div>`);
+}
+
+function submitNilai(mhsId, pengujiKey) {
+  const n1 = parseInt(document.getElementById('m-n1').value) || 0;
+  const n2 = parseInt(document.getElementById('m-n2').value) || 0;
+  const n3 = parseInt(document.getElementById('m-n3').value) || 0;
+  const catatan = document.getElementById('m-catatan-nilai').value;
+  let nilai = Object.values(appData.nilai).find(n => n.mahasiswaId === mhsId);
+  if (!nilai) {
+    const id = genId('n');
+    appData.nilai[id] = { id, skripsiId:'', mahasiswaId: mhsId, penguji1:{pembimbing:null,presentasi:null,penguasaan:null}, penguji2:{pembimbing:null,presentasi:null,penguasaan:null}, penguji3:{pembimbing:null,presentasi:null,penguasaan:null}, totalNilai:null, grade:null, catatan:'' };
+    nilai = appData.nilai[id];
+    const sk = getMhsSkripsiById(mhsId);
+    if (sk) nilai.skripsiId = sk.id;
+  }
+  nilai[pengujiKey] = { pembimbing: n1, presentasi: n2, penguasaan: n3 };
+  nilai.catatan = catatan;
+  // Hitung total jika semua penguji yang terlibat sudah input
+  const p1 = nilai.penguji1; const p2 = nilai.penguji2; const p3 = nilai.penguji3;
+  const p1Done = p1 && p1.pembimbing !== null;
+  const p2Done = p2 && p2.pembimbing !== null;
+  const p3Done = p3 && p3.pembimbing !== null;
+  // Cek apakah sidang ini punya penguji3
+  const sidangData = Object.values(appData.sidang).find(j => j.mahasiswaId === mhsId);
+  const punya3 = sidangData && sidangData.dosPenguji3;
+  const semuaSelesai = p1Done && p2Done && (!punya3 || p3Done);
+  if (semuaSelesai) {
+    const avg1 = (p1.pembimbing+p1.presentasi+p1.penguasaan)/3;
+    const avg2 = (p2.pembimbing+p2.presentasi+p2.penguasaan)/3;
+    let total;
+    if (punya3 && p3Done) {
+      const avg3 = (p3.pembimbing+p3.presentasi+p3.penguasaan)/3;
+      total = Math.round((avg1 + avg2 + avg3) / 3);
+    } else {
+      total = Math.round((avg1 + avg2) / 2);
+    }
+    nilai.totalNilai = total;
+    nilai.grade = total>=85?'A':total>=80?'A-':total>=75?'B+':total>=70?'B':total>=65?'B-':total>=60?'C+':total>=55?'C':'D';
+    const sk = appData.skripsi[nilai.skripsiId];
+    if (sk) {
+      sk.status = 'wisuda';
+      if (!sk.riwayatProgres) sk.riwayatProgres = [];
+      sk.riwayatProgres.push({
+        status: 'wisuda',
+        tanggal: new Date().toISOString().slice(0,10),
+        catatan: `Nilai akhir: ${total} (${nilai.grade})`,
+        oleh: currentUser.name,
+      });
+    }
+  }
+  saveData(); closeModal(); renderInputNilai();
+  // Catat ke logbook jika nilai akhir sudah terhitung
+  if (semuaSelesai) {
+    const sk2 = appData.skripsi[nilai.skripsiId];
+    if (sk2) {
+      const logId = genId('b');
+      appData.bimbingan[logId] = {
+        id: logId,
+        skripsiId: nilai.skripsiId,
+        tanggal: new Date().toISOString().slice(0,10),
+        topik: '🎓 Nilai Akhir Sidang Skripsi',
+        catatan: `Semua penguji telah menginput nilai. Nilai akhir: ${nilai.totalNilai} (${nilai.grade}).`,
+        catatanDosen: nilai.catatan || '',
+        status: 'selesai',
+        dosbingId: sk2.dosbingId,
+        dosbingId2: sk2.dosbingId2 || '',
+        mahasiswaId: mhsId,
+        dicatatOleh: currentUser.name,
+        tglDibuat: new Date().toISOString().slice(0,10),
+        tipeEntri: 'sistem',
+      };
+      saveData();
+    }
+  }
+}
+
+// ═══════════════════════════════════════
+// ADMIN PAGES
+// ═══════════════════════════════════════
+function renderMhsList() {
+  const mc = document.getElementById('main-content');
+  const mhsList = Object.values(appData.users).filter(u => u.role === 'mahasiswa');
+  mc.innerHTML = `
+    <div class="page-header"><h1>Data Mahasiswa</h1></div>
+    <div class="action-bar">
+      <span style="font-size:.875rem;color:var(--text2);">${mhsList.length} mahasiswa</span>
+      <button class="btn btn-green" onclick="showModalTambahMhs()">+ Tambah Mahasiswa</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nama</th><th>NIM</th><th>Username</th><th>Skripsi</th><th>Aksi</th></tr></thead>
+          <tbody>
+            ${mhsList.map(m => {
+              const sk = getMhsSkripsiById(m.id);
+              return `<tr>
+                <td><strong>${m.name}</strong></td>
+                <td>${m.nim}</td>
+                <td><code style="background:var(--surface2);padding:.1rem .4rem;border-radius:4px;font-size:.8rem;">${Object.keys(appData.users).find(k=>appData.users[k]===m)}</code></td>
+                <td>${sk ? statusBadge(sk.status) : '<span class="badge badge-gray">Belum ada</span>'}</td>
+                <td><div style="display:flex;gap:.4rem;"><button class="btn btn-ghost btn-sm" onclick="editMhs('${m.id}')">Edit</button><button class="btn btn-red btn-sm" onclick="hapusMhs('${m.id}')">Hapus</button></div></td>
+              </tr>`;
+            }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text3);">Belum ada data</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function showModalTambahMhs() {
+  openModal(`
+    <h2>Tambah Mahasiswa</h2>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nama Lengkap</label><input class="form-input" id="m-nama" placeholder="Nama mahasiswa"></div>
+      <div class="form-group"><label class="form-label">NIM</label><input class="form-input" id="m-nim" placeholder="220201001"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="m-uname" placeholder="mhs001"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="m-pwd" type="password" placeholder="password"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitTambahMhs()">Tambahkan</button>
+    </div>`);
+}
+function submitTambahMhs() {
+  const nama = document.getElementById('m-nama').value.trim();
+  const nim  = document.getElementById('m-nim').value.trim();
+  const uname= document.getElementById('m-uname').value.trim();
+  const pwd  = document.getElementById('m-pwd').value.trim();
+  if (!nama||!nim||!uname||!pwd) { alert('Semua field wajib diisi!'); return; }
+  if (appData.users[uname]) { alert('Username sudah digunakan!'); return; }
+  appData.users[uname] = { id: uname, role:'mahasiswa', name: nama, nim, password: pwd };
+  saveData(); closeModal(); renderMhsList();
+}
+function editMhs(id) {
+  const u = Object.values(appData.users).find(u=>u.id===id);
+  const uname = Object.keys(appData.users).find(k=>appData.users[k].id===id);
+  openModal(`
+    <h2>Edit Mahasiswa</h2>
+    <div class="form-group"><label class="form-label">Nama</label><input class="form-input" id="m-nama" value="${u.name}"></div>
+    <div class="form-group"><label class="form-label">NIM</label><input class="form-input" id="m-nim" value="${u.nim||''}"></div>
+    <div class="form-group"><label class="form-label">Password Baru (kosongkan jika tidak diubah)</label><input class="form-input" id="m-pwd" type="password" placeholder="password baru"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitEditMhs('${uname}')">Simpan</button>
+    </div>`);
+}
+function submitEditMhs(uname) {
+  appData.users[uname].name = document.getElementById('m-nama').value.trim();
+  appData.users[uname].nim  = document.getElementById('m-nim').value.trim();
+  const pwd = document.getElementById('m-pwd').value.trim();
+  if (pwd) appData.users[uname].password = pwd;
+  saveData(); closeModal(); renderMhsList();
+}
+function hapusMhs(id) {
+  if (!confirm('Hapus mahasiswa ini?')) return;
+  const uname = Object.keys(appData.users).find(k=>appData.users[k].id===id);
+  delete appData.users[uname];
+  saveData(); renderMhsList();
+}
+
+function renderDsnList() {
+  const mc = document.getElementById('main-content');
+  const dsnList = Object.values(appData.users).filter(u => u.role === 'dosen');
+  mc.innerHTML = `
+    <div class="page-header"><h1>Data Dosen</h1></div>
+    <div class="action-bar">
+      <span style="font-size:.875rem;color:var(--text2);">${dsnList.length} dosen</span>
+      <button class="btn btn-green" onclick="showModalTambahDsn()">+ Tambah Dosen</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nama</th><th>NIP</th><th>Username</th><th>Jml. Bimbingan</th><th>Aksi</th></tr></thead>
+          <tbody>
+            ${dsnList.map(d => {
+              const uname = Object.keys(appData.users).find(k=>appData.users[k]===d);
+              const jml = getDosenBimbingan(d.id).length;
+              return `<tr>
+                <td><strong>${d.name}</strong></td>
+                <td>${d.nip||'-'}</td>
+                <td><code style="background:var(--surface2);padding:.1rem .4rem;border-radius:4px;font-size:.8rem;">${uname}</code></td>
+                <td>${jml}</td>
+                <td><div style="display:flex;gap:.4rem;"><button class="btn btn-ghost btn-sm" onclick="editDsn('${d.id}')">Edit</button><button class="btn btn-red btn-sm" onclick="hapusDsn('${d.id}')">Hapus</button></div></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function showModalTambahDsn() {
+  openModal(`
+    <h2>Tambah Dosen</h2>
+    <div class="form-group"><label class="form-label">Nama Lengkap</label><input class="form-input" id="m-nama" placeholder="Dr. Nama Dosen, M.Kom"></div>
+    <div class="form-group"><label class="form-label">NIP</label><input class="form-input" id="m-nip" placeholder="NIP Dosen"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="m-uname" placeholder="dsn001"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="m-pwd" type="password" placeholder="password"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitTambahDsn()">Tambahkan</button>
+    </div>`);
+}
+function submitTambahDsn() {
+  const nama=document.getElementById('m-nama').value.trim(), nip=document.getElementById('m-nip').value.trim();
+  const uname=document.getElementById('m-uname').value.trim(), pwd=document.getElementById('m-pwd').value.trim();
+  if (!nama||!uname||!pwd) { alert('Nama, username, dan password wajib!'); return; }
+  if (appData.users[uname]) { alert('Username sudah ada!'); return; }
+  appData.users[uname] = { id: uname, role:'dosen', name: nama, nip, password: pwd };
+  saveData(); closeModal(); renderDsnList();
+}
+function editDsn(id) {
+  const d = Object.values(appData.users).find(u=>u.id===id);
+  const uname = Object.keys(appData.users).find(k=>appData.users[k].id===id);
+  openModal(`
+    <h2>Edit Dosen</h2>
+    <div class="form-group"><label class="form-label">Nama</label><input class="form-input" id="m-nama" value="${d.name}"></div>
+    <div class="form-group"><label class="form-label">NIP</label><input class="form-input" id="m-nip" value="${d.nip||''}"></div>
+    <div class="form-group"><label class="form-label">Password Baru</label><input class="form-input" id="m-pwd" type="password" placeholder="kosongkan jika tidak diubah"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="submitEditDsn('${uname}')">Simpan</button>
+    </div>`);
+}
+function submitEditDsn(uname) {
+  appData.users[uname].name = document.getElementById('m-nama').value.trim();
+  appData.users[uname].nip  = document.getElementById('m-nip').value.trim();
+  const pwd = document.getElementById('m-pwd').value.trim();
+  if (pwd) appData.users[uname].password = pwd;
+  saveData(); closeModal(); renderDsnList();
+}
+function hapusDsn(id) {
+  if (!confirm('Hapus dosen ini?')) return;
+  const uname = Object.keys(appData.users).find(k=>appData.users[k].id===id);
+  delete appData.users[uname];
+  saveData(); renderDsnList();
+}
+
+function renderAllSkripsi() {
+  const mc = document.getElementById('main-content');
+  const all = Object.values(appData.skripsi);
+  mc.innerHTML = `
+    <div class="page-header"><h1>Semua Skripsi</h1></div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Mahasiswa</th><th>Judul Skripsi</th><th>Pembimbing</th><th>Tahapan</th><th>Progres</th><th>Tgl Pengajuan</th></tr></thead>
+          <tbody>
+            ${all.map(sk => {
+              const mhs = appData.users[sk.mahasiswaId];
+              const dsn = appData.users[sk.dosbingId];
+              const dsn2 = sk.dosbingId2 ? appData.users[sk.dosbingId2] : null;
+              const pct = progressPercent(sk.status);
+              return `<tr>
+                <td><strong>${mhs ? mhs.name : '-'}</strong><br><span style="font-size:.72rem;color:var(--text3);">${mhs?mhs.nim:''}</span></td>
+                <td style="max-width:200px;">${sk.judul}</td>
+                <td>${dsn ? dsn.name.split(',')[0] : '-'}${dsn2 ? '<br><span style="font-size:.72rem;color:var(--text3);">' + dsn2.name.split(',')[0] + '</span>' : ''}</td>
+                <td>${statusBadge(sk.status)}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:.5rem;min-width:100px;">
+                    <div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:${pct}%"></div></div>
+                    <span style="font-size:.72rem;font-weight:700;color:var(--navy-700);">${pct}%</span>
+                  </div>
+                </td>
+                <td>${sk.tglPengajuan}</td>
+              </tr>`;
+            }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text3);">Belum ada skripsi</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderKelolaAkun() {
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `
+    <div class="page-header"><h1>Kelola Akun</h1><p>Informasi akun dan pengaturan keamanan</p></div>
+    <div class="grid-2" style="align-items:start;max-width:700px;">
+      <div class="card">
+        <div class="card-title">Informasi Akun</div>
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--navy-700);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;flex-shrink:0;">
+            ${currentUser.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:.95rem;">${currentUser.name}</div>
+            <div style="font-size:.78rem;color:var(--text3);">${{admin:'Administrator',mahasiswa:'Mahasiswa',dosen:'Dosen Pembimbing'}[currentUser.role]}</div>
+          </div>
+        </div>
+        <div style="display:grid;gap:.6rem;font-size:.83rem;">
+          <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border);">
+            <span style="color:var(--text2);">Username</span>
+            <strong>${currentUser.username}</strong>
+          </div>
+          ${currentUser.nim ? `<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border);">
+            <span style="color:var(--text2);">NIM</span><strong>${currentUser.nim}</strong>
+          </div>` : ''}
+          ${currentUser.nip ? `<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border);">
+            <span style="color:var(--text2);">NIP</span><strong>${currentUser.nip}</strong>
+          </div>` : ''}
+          <div style="display:flex;justify-content:space-between;padding:.5rem 0;">
+            <span style="color:var(--text2);">Role</span>
+            <span>${{admin:'badge-blue',mahasiswa:'badge-green',dosen:'badge-amber'}[currentUser.role]?statusBadge(currentUser.role):currentUser.role}</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ganti Password</div>
+        <div class="form-group"><label class="form-label">Password Lama</label><input class="form-input" id="old-pwd" type="password"></div>
+        <div class="form-group"><label class="form-label">Password Baru</label><input class="form-input" id="new-pwd" type="password"></div>
+        <div class="form-group"><label class="form-label">Konfirmasi Password Baru</label><input class="form-input" id="conf-pwd" type="password"></div>
+        <div id="pwd-msg" style="font-size:.82rem;min-height:1.2em;margin-top:.5rem;"></div>
+        <button class="btn btn-green" style="margin-top:.75rem;" onclick="gantiPassword()">Ganti Password</button>
+      </div>
+    </div>`;
+}
+
+function gantiPassword() {
+  const old = document.getElementById('old-pwd').value;
+  const neu = document.getElementById('new-pwd').value;
+  const con = document.getElementById('conf-pwd').value;
+  const msg = document.getElementById('pwd-msg');
+  if (appData.users[currentUser.username].password !== old) { msg.style.color='var(--danger)'; msg.textContent='❌ Password lama salah.'; return; }
+  if (neu !== con) { msg.style.color='var(--danger)'; msg.textContent='❌ Konfirmasi password tidak cocok.'; return; }
+  if (neu.length < 6) { msg.style.color='var(--danger)'; msg.textContent='❌ Password minimal 6 karakter.'; return; }
+  appData.users[currentUser.username].password = neu;
+  saveData();
+  msg.style.color='var(--navy-600)'; msg.textContent='✅ Password berhasil diubah!';
+}
+
+// ═══════════════════════════════════════
+// MAHASISWA: PROGRES SKRIPSI
+// ═══════════════════════════════════════
+function renderProgesSkripsi() {
+  const mc = document.getElementById('main-content');
+  const skripsi = getMhsSkripsi(currentUser.id);
+  if (!skripsi) {
+    mc.innerHTML = `<div class="page-header"><h1>Progres Skripsi</h1></div><div class="info-box amber">Anda belum mengajukan judul skripsi. <strong onclick="navigate('pengajuan-judul')" style="cursor:pointer;text-decoration:underline;">Ajukan sekarang →</strong></div>`;
+    return;
+  }
+  const curIdx = tahapanIndex(skripsi.status);
+  const riwayat = (skripsi.riwayatProgres || []).slice().reverse();
+  mc.innerHTML = `
+    <div class="page-header">
+      <h1>Progres Skripsi</h1>
+      <p>Pantau tahapan perjalanan skripsi Anda</p>
+    </div>
+    <div class="grid-2" style="align-items:start;">
+      <div class="card">
+        <div class="card-title">Tahapan Skripsi</div>
+        <div style="margin-bottom:1rem;padding:.75rem;background:var(--navy-50);border-radius:var(--radius);border:1px solid var(--navy-100);">
+          <div style="font-size:.72rem;font-weight:600;color:var(--navy-700);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem;">Judul</div>
+          <div style="font-weight:600;font-size:.875rem;color:var(--text);">${skripsi.judul}</div>
+        </div>
+        ${renderProgresBar(skripsi.status)}
+      </div>
+      <div class="card">
+        <div class="card-title">Riwayat Perubahan Status</div>
+        ${riwayat.length === 0
+          ? '<div class="empty-state"><div class="icon">📋</div><p>Belum ada riwayat perubahan</p></div>'
+          : `<div class="timeline">${riwayat.map(r => {
+              const tahapLabel = TAHAPAN.find(t=>t.key===r.status)?.label || r.status;
+              return `<div class="tl-item">
+                <div class="tl-dot" style="background:var(--navy-700);"></div>
+                <div class="tl-date">${r.tanggal}${r.oleh?' · '+r.oleh:''}</div>
+                <div class="tl-content">
+                  <strong>${tahapLabel}</strong>
+                  ${r.catatan?`<p>${r.catatan}</p>`:''}
+                  ${statusBadge(r.status)}
+                </div>
+              </div>`;
+            }).join('')}</div>`
+        }
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════
+// DOSEN: KELOLA PROGRES MAHASISWA
+// ═══════════════════════════════════════
+function renderKelolaProgres() {
+  const mc = document.getElementById('main-content');
+  const bimbingans = getDosenBimbingan(currentUser.id);
+  mc.innerHTML = `
+    <div class="page-header">
+      <h1>Update Progres Mahasiswa</h1>
+      <p>Perbarui tahapan skripsi untuk setiap mahasiswa bimbingan</p>
+    </div>
+    ${bimbingans.length === 0
+      ? '<div class="empty-state"><div class="icon">👤</div><p>Belum ada mahasiswa bimbingan</p></div>'
+      : bimbingans.map(sk => {
+          const mhs = appData.users[sk.mahasiswaId];
+          const curIdx = tahapanIndex(sk.status);
+          const pct = progressPercent(sk.status);
+          const nextTahap = TAHAPAN[curIdx + 1];
+          return `<div class="card" style="margin-bottom:1rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;">
+              <div>
+                <div style="font-weight:700;">${mhs ? mhs.name : '-'} <span style="font-size:.78rem;color:var(--text3);font-weight:400;">${mhs?mhs.nim:''}</span></div>
+                <div style="font-size:.83rem;color:var(--text2);margin-top:.2rem;max-width:360px;">${sk.judul}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:.5rem;">
+                ${statusBadge(sk.status)}
+                <span style="font-size:.82rem;font-weight:700;color:var(--navy-700);">${pct}%</span>
+              </div>
+            </div>
+            <div class="progress-bar" style="margin-bottom:.875rem;"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+              ${nextTahap
+                ? `<button class="btn btn-green btn-sm" onclick="showModalUpdateProgres('${sk.id}','${nextTahap.key}','${nextTahap.label}')">
+                    ➜ Naikkan ke: ${nextTahap.label}
+                  </button>`
+                : `<span class="badge badge-green">✓ Semua tahapan selesai</span>`}
+              <button class="btn btn-ghost btn-sm" onclick="showModalUpdateProgresCustom('${sk.id}')">Pilih Tahap Manual</button>
+              <button class="btn btn-ghost btn-sm" onclick="showDetailProgres('${sk.id}')">Lihat Detail</button>
+              <button class="btn btn-ghost btn-sm" onclick="showKartuBimbingan('${sk.id}')">🖨️ Kartu</button>
+            </div>
+          </div>`;
+        }).join('')}`;
+}
+
+function showModalUpdateProgres(skripsiId, tahapKey, tahapLabel) {
+  openModal(`
+    <h2>Update Progres Skripsi</h2>
+    <div class="info-box blue">Tahapan baru: <strong>${tahapLabel}</strong></div>
+    <div class="form-group"><label class="form-label">Tanggal</label>
+      <input class="form-input" id="m-tgl-progres" type="date" value="${new Date().toISOString().slice(0,10)}">
+    </div>
+    <div class="form-group"><label class="form-label">Catatan (opsional)</label>
+      <textarea class="form-textarea" id="m-catatan-progres" placeholder="Catatan untuk mahasiswa..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="doUpdateProgres('${skripsiId}','${tahapKey}')">Simpan</button>
+    </div>`);
+}
+
+function showModalUpdateProgresCustom(skripsiId) {
+  const sk = appData.skripsi[skripsiId];
+  const curIdx = tahapanIndex(sk.status);
+  openModal(`
+    <h2>Pilih Tahapan Manual</h2>
+    <div class="form-group"><label class="form-label">Tahapan</label>
+      <select class="form-select" id="m-tahap-manual">
+        ${TAHAPAN.map((t,i) => `<option value="${t.key}" ${i===curIdx?'selected':''}>${i+1}. ${t.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Tanggal</label>
+      <input class="form-input" id="m-tgl-progres" type="date" value="${new Date().toISOString().slice(0,10)}">
+    </div>
+    <div class="form-group"><label class="form-label">Catatan (opsional)</label>
+      <textarea class="form-textarea" id="m-catatan-progres" placeholder="Catatan untuk mahasiswa..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="doUpdateProgresManual('${skripsiId}')">Simpan</button>
+    </div>`);
+}
+
+function doUpdateProgresManual(skripsiId) {
+  const tahapKey = document.getElementById('m-tahap-manual').value;
+  doUpdateProgres(skripsiId, tahapKey);
+}
+
+function doUpdateProgres(skripsiId, tahapKey) {
+  const tgl = document.getElementById('m-tgl-progres').value;
+  const catatan = document.getElementById('m-catatan-progres').value.trim();
+  if (!tgl) { alert('Tanggal wajib diisi!'); return; }
+  const sk = appData.skripsi[skripsiId];
+  sk.status = tahapKey;
+  if (!sk.riwayatProgres) sk.riwayatProgres = [];
+  sk.riwayatProgres.push({
+    status: tahapKey,
+    tanggal: tgl,
+    catatan,
+    oleh: currentUser.name,
+  });
+  // Catat ke logbook bimbingan
+  const tahapLabel = TAHAPAN.find(t => t.key === tahapKey)?.label || tahapKey;
+  const logId = genId('b');
+  appData.bimbingan[logId] = {
+    id: logId,
+    skripsiId,
+    tanggal: tgl,
+    topik: `📊 Update Progres: ${tahapLabel}`,
+    catatan: `Status skripsi diperbarui ke tahap "${tahapLabel}" oleh dosen pembimbing.`,
+    catatanDosen: catatan || `Progres diperbarui ke: ${tahapLabel}.`,
+    status: 'selesai',
+    dosbingId: sk.dosbingId,
+    dosbingId2: sk.dosbingId2 || '',
+    mahasiswaId: sk.mahasiswaId,
+    reviewOleh: currentUser.name,
+    reviewTgl: tgl,
+    tipeEntri: 'sistem',
+  };
+  saveData(); closeModal();
+  // refresh halaman yang relevan
+  const activeNav = document.querySelector('.nav-item.active');
+  const activePage = activeNav ? activeNav.dataset.page : 'kelola-progres';
+  if (activePage === 'daftar-bimbingan') renderDaftarBimbingan();
+  else renderKelolaProgres();
+}
+
+function showDetailProgres(skripsiId) {
+  const sk = appData.skripsi[skripsiId];
+  const mhs = appData.users[sk.mahasiswaId];
+  const riwayat = (sk.riwayatProgres || []).slice().reverse();
+  openModal(`
+    <h2>Detail Progres — ${mhs ? mhs.name : '-'}</h2>
+    <div style="margin-bottom:1rem;">${renderProgresBar(sk.status)}</div>
+    <div style="font-weight:700;font-size:.83rem;color:var(--text2);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em;">Riwayat Perubahan</div>
+    ${riwayat.length === 0
+      ? '<div class="empty-state"><p>Belum ada riwayat</p></div>'
+      : `<div class="timeline">${riwayat.map(r=>{
+          const lbl = TAHAPAN.find(t=>t.key===r.status)?.label||r.status;
+          return `<div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">${r.tanggal}${r.oleh?' · '+r.oleh:''}</div>
+            <div class="tl-content"><strong>${lbl}</strong>${r.catatan?`<p>${r.catatan}</p>`:''}${statusBadge(r.status)}</div>
+          </div>`;
+        }).join('')}</div>`}
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Tutup</button></div>`);
+}
+
+
+// ═══════════════════════════════════════
+// KARTU BIMBINGAN - CETAK / PDF
+// ═══════════════════════════════════════
+function showKartuBimbingan(skripsiId) {
+  const sk = appData.skripsi[skripsiId];
+  const mhs = appData.users[sk.mahasiswaId];
+  const dosbing1 = appData.users[sk.dosbingId];
+  const dosbing2 = appData.users[sk.dosbingId2];
+  const logbooks = getSkripsiLogbook(sk.id).slice().reverse(); // urut dari awal
+
+  const statusLabelMap = {
+    'selesai':'Selesai','revisi':'Perlu Revisi','menunggu':'Menunggu','review':'Dalam Review'
+  };
+
+  openModal(`
+    <h2>🖨️ Cetak Kartu Bimbingan</h2>
+    <div class="info-box blue">Isi nama kampus dan program studi sebelum mencetak. Klik <strong>Cetak / Simpan PDF</strong> untuk membuka dialog cetak browser.</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nama Kampus / Universitas</label>
+        <input class="form-input" id="kb-kampus" placeholder="Contoh: Universitas XYZ">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Program Studi</label>
+        <input class="form-input" id="kb-prodi" placeholder="Contoh: Teknik Informatika">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn btn-green" onclick="doCetakKartu('${skripsiId}')">🖨️ Cetak / Simpan PDF</button>
+    </div>`);
+}
+
+function doCetakKartu(skripsiId) {
+  const kampus = document.getElementById('kb-kampus').value.trim() || 'Nama Kampus';
+  const prodi  = document.getElementById('kb-prodi').value.trim()  || 'Program Studi';
+  const sk = appData.skripsi[skripsiId];
+  const mhs = appData.users[sk.mahasiswaId];
+  const dosbing1 = appData.users[sk.dosbingId];
+  const dosbing2 = sk.dosbingId2 ? appData.users[sk.dosbingId2] : null;
+  const logbooks = getSkripsiLogbook(sk.id).slice().reverse();
+
+  const statusLabelMap = {
+    'selesai':'Selesai ✓','revisi':'Perlu Revisi','menunggu':'Menunggu','review':'Dalam Review'
+  };
+
+  const rows = logbooks.length > 0
+    ? logbooks.map((b, i) => {
+        const tipeTag = b.tipeEntri === 'sistem' ? ' [Sistem]' : b.tipeEntri === 'dokumen' ? ' [Dok]' : b.sumberDokumen ? ' [Review Dok]' : '';
+        return `<tr>
+          <td>${i+1}</td>
+          <td>${b.tanggal}</td>
+          <td>${b.topik}${tipeTag}</td>
+          <td>${b.catatan || '-'}</td>
+          <td>${b.catatanDosen || '-'}</td>
+          <td style="text-align:center;">${statusLabelMap[b.status] || b.status}</td>
+        </tr>`;
+      }).join('')
+    : `<tr><td colspan="6" style="text-align:center;color:#888;padding:1.5rem;">Belum ada catatan bimbingan</td></tr>`;
+
+  const ttd2 = dosbing2 ? `
+    <div class="kartu-ttd-box">
+      <div class="ttd-label">Dosen Pembimbing 2,</div>
+      <div class="kartu-ttd-name">${dosbing2.name}</div>
+      <div class="kartu-ttd-nip">NIP. ${dosbing2.nip || '........................'}</div>
+    </div>` : `
+    <div class="kartu-ttd-box">
+      <div class="ttd-label">Mengetahui,</div>
+      <div class="kartu-ttd-name">Ketua Program Studi</div>
+      <div class="kartu-ttd-nip">NIP. ........................</div>
+    </div>`;
+
+  const tglCetak = new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+
+  document.getElementById('print-area').innerHTML = `
+    <div class="kartu-bimbingan">
+      <div class="kartu-header">
+        <div class="kampus-name">${kampus}</div>
+        <div class="prodi-name">Program Studi ${prodi}</div>
+        <div class="doc-title">Kartu Bimbingan Skripsi</div>
+      </div>
+      <div class="kartu-identitas">
+        <span class="lbl">Nama Mahasiswa</span><span>: ${mhs ? mhs.name : '-'}</span>
+        <span class="lbl">NIM</span><span>: ${mhs ? mhs.nim : '-'}</span>
+        <span class="lbl">Judul Skripsi</span><span>: ${sk.judul}</span>
+        <span class="lbl">Pembimbing 1</span><span>: ${dosbing1 ? dosbing1.name : '-'}</span>
+        <span class="lbl">Pembimbing 2</span><span>: ${dosbing2 ? dosbing2.name : '-'}</span>
+        <span class="lbl">Tahun Akademik</span><span>: ${new Date().getFullYear()}/${new Date().getFullYear()+1}</span>
+      </div>
+      <table class="kartu-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th style="width:90px;">Tanggal</th>
+            <th>Topik / Materi Bimbingan</th>
+            <th>Catatan Mahasiswa</th>
+            <th>Catatan / Arahan Dosen</th>
+            <th style="width:75px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="font-size:.78rem;color:#555;margin-bottom:1rem;">
+        Total bimbingan: <strong>${logbooks.length} sesi</strong> &nbsp;·&nbsp; Dicetak: ${tglCetak}
+      </div>
+      <div class="kartu-ttd">
+        <div class="kartu-ttd-box">
+          <div class="ttd-label">Dosen Pembimbing 1,</div>
+          <div class="kartu-ttd-name">${dosbing1 ? dosbing1.name : '........................'}</div>
+          <div class="kartu-ttd-nip">NIP. ${dosbing1 && dosbing1.nip ? dosbing1.nip : '........................'}</div>
+        </div>
+        ${ttd2}
+      </div>
+    </div>`;
+
+  const pa = document.getElementById('print-area');
+  pa.style.display = 'block';
+  closeModal();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.print();
+      pa.style.display = 'none';
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+
+// ═══════════════════════════════════════
+// TOGGLE CARD COLLAPSIBLE
+// ═══════════════════════════════════════
+function toggleCard(cardId) {
+  const body    = document.getElementById(cardId);
+  const chevron = document.getElementById(cardId + '-chevron');
+  if (!body) return;
+  const isOpen  = body.style.display !== 'none';
+  body.style.display    = isOpen ? 'none' : 'block';
+  if (chevron) chevron.textContent = isOpen ? '▼' : '▲';
+}
+
+function openModal(content) {
+  document.getElementById('modal-container').innerHTML = `
+    <div class="modal-overlay" onclick="handleOverlayClick(event)">
+      <div class="modal">${content}</div>
+    </div>`;
+}
+function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
+function handleOverlayClick(e) { if (e.target.classList.contains('modal-overlay')) closeModal(); }
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
